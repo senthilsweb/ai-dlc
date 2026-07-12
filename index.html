@@ -506,28 +506,28 @@
            ========================================== -->
       <section class="slide-brand" data-section="The Mob">
         <span class="kicker"><span class="ph">The Method</span> Who's In The Mob</span>
-        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">A "mob" is the group doing the ceremonies &mdash; most of them are AI</h1>
-        <p class="lede">Every ceremony has a named role behind it. Two are always a person; almost everything else is an AI agent doing that role in minutes, not days.</p>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Three people carry the weight. AI does the typing, fast.</h1>
+        <p class="lede">It is not just the Product Owner doing everything. Every ceremony has a human accountable for it and an AI agent doing the fast work under them &mdash; and that human is one of three people, wearing different hats.</p>
 
         <div class="panel" style="padding:0;overflow:hidden;margin-top:8px;">
           <table class="toolkit-table" style="margin:0;">
-            <thead><tr><th style="width:18%;">Role</th><th style="width:16%;">Played by</th><th>What they do here</th></tr></thead>
+            <thead><tr><th style="width:16%;">Role / ceremony</th><th style="width:30%;">Human, accountable</th><th style="width:24%;">AI, does the work</th><th>&nbsp;</th></tr></thead>
             <tbody>
-              <tr><td><b>Product Owner</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Human</span></td><td>States the Intent, approves every gate, has the final word at UAT. Always a person &mdash; no exceptions.</td></tr>
-              <tr><td><b>Architect</b></td><td><span class="role-badge both"><iconify-icon icon="mdi:account-supervisor"></iconify-icon>AI drafts, human signs off</span></td><td>Shapes <code>design.md</code>; the owner reviews and approves it before Construction starts.</td></tr>
-              <tr><td><b>Business Analyst</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Drafts the plan during Mob Elaboration &mdash; <code>proposal.md</code>, the six open questions, the revision log.</td></tr>
-              <tr><td><b>AI Engineer</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Writes the code, one Bolt at a time, during Mob Construction.</td></tr>
-              <tr><td><b>QA / Evaluator</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Writes and runs the evals, graded against the rubric &mdash; before or alongside the code, never after.</td></tr>
-              <tr><td><b>Security / InfoSec</b></td><td><span class="role-badge both"><iconify-icon icon="mdi:account-supervisor"></iconify-icon>AI attacks it, human signs off</span></td><td>Deliberately tries to trick or break it during the Security Baseline ceremony.</td></tr>
-              <tr><td><b>DevOps</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Wires up monitoring, releases, and deployment configuration.</td></tr>
-              <tr><td><b>Visual Designer</b></td><td><span class="role-badge ai" style="opacity:0.6;"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Not used yet</span></td><td>This project has no on-screen interface yet, so this role hasn't been needed &mdash; it would join once one gets built.</td></tr>
-              <tr><td><b>UAT</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Human (the Product Owner)</span></td><td>The final real-world check &mdash; a real run in Claude Desktop or the actual chat window, not a stand-in.</td></tr>
+              <tr><td><b>Product Owner</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Always this person</span></td><td>&mdash;</td><td>States the Intent, approves every gate, has the final word.</td></tr>
+              <tr><td><b>Business Analyst</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Elaboration)</span></td><td>Product Owner reviews and edits every round</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>proposal.md</code> &mdash; six open questions, the revision log.</td></tr>
+              <tr><td><b>Architect</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(design)</span></td><td>AI Engineer reviews and approves the shape</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>design.md</code> before Construction starts.</td></tr>
+              <tr><td><b>AI Engineer</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Construction)</span></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Directs, reviews, approves</span></td><td>Writes the code</td><td>The bot writes it; the engineer steers, reviews, and approves every Bolt before the next starts.</td></tr>
+              <tr><td><b>QA / Evaluator</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Extends the rubric, reviews results</span></td><td>Writes &amp; runs routine evals</td><td>A person adds the harder judgment-call evals and reviews every result; AI handles the routine ones, instantly.</td></tr>
+              <tr><td><b>Security / InfoSec</b></td><td>Signs off before Security Baseline passes</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Runs the attack</span></td><td>AI tries to trick or break it; a human decides if the fix is enough.</td></tr>
+              <tr><td><b>DevOps</b></td><td>Reviewed as part of each Bolt</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Wires it up</span></td><td>Monitoring, releases, and deployment configuration.</td></tr>
+              <tr><td><b>Visual Designer</b></td><td>&mdash;</td><td><span class="role-badge ai" style="opacity:0.55;"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Not used yet</span></td><td>No on-screen interface exists yet &mdash; this role joins once one is built.</td></tr>
+              <tr><td><b>UAT</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Product Owner, in person</span></td><td>&mdash;</td><td>A real run, not a stand-in &mdash; e.g. an actual chat conversation.</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="emphasis-box green" style="margin-top:10px;">
-          <b>Almost every role here is an AI agent</b> &mdash; only the Product Owner is always human, plus a human sign-off on the Architect's and Security reviewer's work. Each AI role finishes its ceremony in minutes, not days. That speed is exactly why the work can be split into small, reviewable Bolts instead of multi-week sprints.
+          <b>Three people carry this project:</b> the <b>Product Owner</b> (Intent, every gate, UAT), the <b>AI Engineer</b> (reviews and approves every Bolt's actual code), and <b>QA</b> (extends the rubric, reviews every eval run). Every other hat above is one of these three people directing an AI agent &mdash; never an AI agent left unsupervised.
         </div>
       </section>
 
@@ -548,7 +548,7 @@
               <tr><td style="color:var(--color-cyan);font-weight:600;">Intent</td><td>The high-level goal, stated in plain language &mdash; the single seed everything grows from.</td><td>"Turn the quick prototype into a real, standalone product."</td></tr>
               <tr><td style="color:var(--color-cyan);font-weight:600;">Ceremony</td><td>A named step in the process, with its own people, inputs, and a written output.</td><td>Mob Elaboration is a ceremony; its output is the plan documents.</td></tr>
               <tr><td style="color:var(--color-cyan);font-weight:600;">Mob Elaboration</td><td>The Inception ceremony where the plan gets drafted; the owner reviews it and asks for changes.</td><td>Six logged rounds of revisions before the plan was approved.</td></tr>
-              <tr><td style="color:var(--color-purple);font-weight:600;">Unit of Work</td><td>One small, self-contained thing to build &mdash; not a whole feature. Replaces the Agile "story."</td><td>One line in <code>tasks.md</code> &mdash; e.g. "block risky web links."</td></tr>
+              <tr><td style="color:var(--color-purple);font-weight:600;">Unit of Work<br><span style="font-size:0.85em;font-weight:400;color:var(--color-mid-gray);">(a "task")</span></td><td>One small, self-contained thing to build &mdash; not a whole feature. Replaces the Agile "story." In this method, "Unit of Work" and "task" mean the same thing.</td><td>One checkbox line in <code>tasks.md</code> &mdash; e.g. "block risky web links."</td></tr>
               <tr><td style="color:var(--color-purple);font-weight:600;">Mob Construction</td><td>The Construction ceremony where code and evals get written, reviewed as they go.</td><td>The owner reviews each Bolt's work before the next one starts.</td></tr>
               <tr><td style="color:var(--color-amber);font-weight:600;">Bolt</td><td>A short burst of Construction &mdash; hours, not weeks. Replaces the Agile "sprint."</td><td>Bolt 3 &mdash; the one AI call plus the command-line tool, done in one sitting.</td></tr>
               <tr><td style="color:var(--color-green);font-weight:600;">Rubric</td><td>An answer key for the grader &mdash; the exact criteria and procedure for marking each eval right or wrong, written before the code exists. The grader (human or AI) follows it; they don't decide the standard themselves.</td><td><code>evals/rubrics.md</code> &mdash; the scoring formula and every HARD/SOFT rule.</td></tr>
@@ -604,6 +604,49 @@
       </section>
 
       <!-- ==========================================
+           SLIDE 7b: How we track it — openspec/ folder + status line
+           ========================================== -->
+      <section class="slide-brand" data-section="How We Track It">
+        <span class="kicker ph-gate"><span class="ph">Inception</span> How We Track It</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">openspec/ &mdash; one folder, one status line, no separate dashboard</h1>
+        <p class="lede">No ticket system, no external tracker. Every decision lives as a file in the repo, reviewed the same way as code &mdash; and status is a line of text a person edits by hand, not a YAML config file.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="editor-window">
+            <div class="editor-titlebar">
+              <span class="editor-dots"><span></span><span></span><span></span></span>
+              <span class="editor-filename">openspec/</span>
+            </div>
+            <div class="codepanel">openspec/
+├── project.md              <span class="cmt">the standing rules every change follows</span>
+├── adr/
+│   └── 0001-....md         <span class="cmt">a recorded architecture decision</span>
+└── changes/
+    ├── <span class="acc">add-job-matcher-cli/</span>    <span class="cmt">← this project's main build</span>
+    │   ├── proposal.md      <span class="ok">why + status line + revision log</span>
+    │   ├── design.md        <span class="ok">the architecture</span>
+    │   ├── tasks.md         <span class="ok">11 Bolts, task by task</span>
+    │   └── specs/.../spec.md <span class="ok">16 rules, one per eval</span>
+    ├── add-openapi-release-artifact/
+    ├── add-graphify-and-ci/
+    └── add-demo-stack-and-playground/  <span class="cmt">← started one day later</span></div>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:file-sign"></iconify-icon> The status line, not a YAML file</h3>
+            <ul>
+              <li>Every <code>proposal.md</code> opens with one line: <code>&gt; Status: IMPLEMENTED</code>.</li>
+              <li>It only ever moves one way: <b>proposed &rarr; approved &rarr; implemented &rarr; verified &rarr; archived</b>.</li>
+              <li>A person edits that line by hand, every time &mdash; nothing promotes itself automatically.</li>
+              <li>Anyone can check where a change stands with one command: <code>/openspec-status</code>.</li>
+            </ul>
+            <div class="emphasis-box green" style="margin-top:10px;">
+              <b>Proof the circle keeps turning:</b> a fourth change folder, <code>add-demo-stack-and-playground</code>, was started the very next day (2026-07-12) &mdash; its own 5 Bolts, already implemented. That's <b>Next Intent</b> happening for real, not just a diagram.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
            SLIDE 8: The build steps, with their tests
            ========================================== -->
       <section class="slide-brand" data-section="Construction">
@@ -613,7 +656,7 @@
 
         <div class="panel" style="padding:0;overflow:hidden;margin-top:10px;">
           <table class="toolkit-table" style="margin:0;">
-            <thead><tr><th style="width:8%;">Bolt</th><th style="width:46%;">What it built</th><th style="width:20%;">Units of Work</th><th style="width:26%;">Evals</th></tr></thead>
+            <thead><tr><th style="width:8%;">Bolt</th><th style="width:44%;">What it built</th><th style="width:22%;">Tasks (Units of Work)</th><th style="width:26%;">Evals</th></tr></thead>
             <tbody>
               <tr><td><b>0</b></td><td>Inception Gate &mdash; settled the six open questions, no code yet</td><td>8 tasks</td><td>&mdash;</td></tr>
               <tr><td><b>1</b></td><td>The scoring math, and the shape of every piece of data</td><td>8 tasks</td><td>37 evals</td></tr>

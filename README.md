@@ -46,15 +46,18 @@ automated checks. See that repo's `openspec/project.md` for the full history.
 
 ## Slide overview
 
-15 slides, in plain English but using AI-DLC's real vocabulary throughout —
+16 slides, in plain English but using AI-DLC's real vocabulary throughout —
 this deck's whole point is teaching that vocabulary, not hiding it: cover ·
 what it does · where the idea came from · the three phases and seven
-ceremonies · the AI-DLC cycle · who's in the mob (which roles are human vs.
-AI) · a shared glossary · the six rounds of plan revisions before any code ·
-all 11 Bolts with their real Units-of-Work and eval counts, as a table · one
-Bolt opened up completely (tasks, evals, and a real bug) · how it's put
-together · evals and the rubric that grades them · how it's kept safe · a
-real trace of a real run, viewed in Arize AX · running it four ways.
+ceremonies · the AI-DLC cycle · who's in the mob (three people carry it —
+Product Owner, AI Engineer, QA — everyone else is one of them directing an
+AI agent) · a shared glossary · the six rounds of plan revisions before any
+code · how the project is tracked (the real `openspec/` folder and its
+status line — no YAML file) · all 11 Bolts with their real task and eval
+counts, as a table · one Bolt opened up completely (tasks, evals, and a real
+bug) · how it's put together · evals and the rubric that grades them · how
+it's kept safe · a real trace of a real run, viewed in Arize AX · running it
+four ways.
 
 ## Other files
 
