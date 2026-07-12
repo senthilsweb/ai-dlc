@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-DLC In Practice: agent-job-matcher</title>
+
+  <!-- read theme synchronously, no flash -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('ai-dlc-deck-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+
+  <style>
+    :root {
+      --color-navy: #0a0f24;
+      --color-panel: #121937;
+      --color-panel-2: #0f1530;
+      --color-panel-3: #0c1430;
+      --color-cyan: #3ec9d6;
+      --color-cyan-2: #6ee7ff;
+      --color-purple: #8b5cf6;
+      --color-green: #10b981;
+      --color-amber: #f59e0b;
+      --color-red: #ef4444;
+      --color-white: #e7ecff;
+      --color-light-gray: #cdd5ee;
+      --color-mid-gray: #94a3c7;
+      --color-dark-gray: #6b7aa3;
+      --color-border: #1f2a55;
+      --color-border-2: #2a3a72;
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --color-navy: #ffffff;
+      --color-panel: #f1f5f9;
+      --color-panel-2: #f8fafc;
+      --color-panel-3: #eef2fb;
+      --color-cyan: #0891b2;
+      --color-cyan-2: #0e7490;
+      --color-purple: #7c3aed;
+      --color-green: #059669;
+      --color-amber: #b45309;
+      --color-red: #b91c1c;
+      --color-white: #0f172a;
+      --color-light-gray: #334155;
+      --color-mid-gray: #64748b;
+      --color-dark-gray: #94a3b8;
+      --color-border: #d8e0f0;
+      --color-border-2: #c2cde8;
+    }
+
+    .theme-toggle {
+      position: fixed; top: 16px; left: 16px; z-index: 1000;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--color-panel); border: 1px solid var(--color-border-2);
+      color: var(--color-white); display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.15s ease;
+    }
+    .theme-toggle:hover { transform: scale(1.08); }
+    .theme-toggle iconify-icon { font-size: 17px; }
+
+    body, html { background: var(--color-navy) !important; }
+    .reveal-viewport { background: var(--color-navy); }
+    .reveal { font-family: var(--font-primary); font-size: 22px; color: var(--color-white); letter-spacing: -0.01em; }
+    .reveal .slides { text-align: left; }
+    .reveal .slides section { padding: 28px 44px; box-sizing: border-box; height: 100%; }
+    .reveal .slides section.slide-brand { background: var(--color-navy); }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 { font-family: var(--font-primary); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 0.5rem 0; color: var(--color-white); }
+    .reveal h1 { font-size: 1.6em; margin-bottom: 0.4rem; }
+    .reveal h2 { font-size: 1.05em; }
+    .reveal h3 { font-size: 0.85em; font-weight: 600; color: var(--color-cyan); }
+    .reveal p { margin: 0 0 0.5rem 0; line-height: 1.5; color: var(--color-light-gray); font-size: 0.62em; }
+
+    .kicker { font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-cyan); margin-bottom: 0.25rem; display: block; }
+    .kicker .ph { display: inline-block; padding: 2px 10px; margin-right: 8px; background: var(--color-cyan); color: #06282d; }
+    .kicker.ph-inception .ph { background: var(--color-cyan); }
+    .kicker.ph-gate { color: var(--color-purple); }
+    .kicker.ph-gate .ph { background: var(--color-purple); color: #fff; }
+    .kicker.ph-construction { color: var(--color-green); }
+    .kicker.ph-construction .ph { background: var(--color-green); color: #06281c; }
+    .kicker.ph-operations { color: var(--color-amber); }
+    .kicker.ph-operations .ph { background: var(--color-amber); color: #2d1c02; }
+    .lede { font-size: 0.62em; color: var(--color-mid-gray); margin: 0; line-height: 1.45; }
+
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { background: var(--color-panel-2); border: 1px solid var(--color-border); padding: 14px 16px; }
+    .panel h3 { margin: 0 0 8px; font-size: 0.72em; }
+    .panel code { background: rgba(62, 201, 214, 0.10); padding: 0 4px; font-size: 0.95em; color: var(--color-cyan-2); font-family: var(--font-mono); }
+    .panel ul { margin: 0; padding-left: 18px; font-size: 0.58em; color: var(--color-light-gray); line-height: 1.6; }
+    .panel li { margin-bottom: 5px; }
+    .panel li b { color: var(--color-white); }
+
+    .codepanel { background: #060a18; border: 1px solid var(--color-border); padding: 14px 18px; font-family: var(--font-mono); font-size: 0.55em; line-height: 1.6; color: #dbe2ff; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; }
+    [data-theme="light"] .codepanel { background: #0f172a; }
+    .codepanel .cmt { color: var(--color-mid-gray); }
+    .codepanel .cmd { color: var(--color-cyan-2); }
+    .codepanel .acc { color: var(--color-amber); }
+    .codepanel .ok { color: var(--color-green); }
+    .codepanel .bad { color: var(--color-red); }
+    .code-label { display: inline-block; font-size: 0.48em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-cyan-2); background: rgba(62,201,214,0.12); border: 1px solid rgba(62,201,214,0.35); padding: 2px 10px; margin: 0 0 6px; font-family: var(--font-mono); }
+
+    .pipeline { display: flex; align-items: stretch; gap: 0; margin-top: 16px; }
+    .pipe-step { flex: 1; text-align: center; position: relative; padding: 0 4px; }
+    .pipe-chip { display: block; font-family: var(--font-mono); font-size: 0.6em; font-weight: 700; padding: 10px 6px; background: var(--color-panel-2); border: 2px solid var(--color-border-2); color: var(--color-mid-gray); }
+    .pipe-step.done .pipe-chip { border-color: var(--color-green); color: var(--color-green); background: rgba(16,185,129,0.08); }
+    .pipe-step.current .pipe-chip { border-color: var(--color-cyan); color: var(--color-cyan-2); background: rgba(62,201,214,0.12); }
+    .pipe-gate { flex: 0 0 auto; display: flex; align-items: center; padding: 0 2px; color: var(--color-dark-gray); font-size: 0.55em; }
+    .pipe-note { display: block; margin-top: 8px; font-size: 0.46em; line-height: 1.45; color: var(--color-mid-gray); }
+    .pipe-note b { color: var(--color-light-gray); }
+
+    .flow-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    .flow-card { background: var(--color-panel-2); border: 1px solid var(--color-border); border-top: 3px solid var(--color-cyan); padding: 14px 16px; position: relative; }
+    .flow-card.green { border-top-color: var(--color-green); }
+    .flow-card.amber { border-top-color: var(--color-amber); }
+    .flow-num { position: absolute; top: -14px; left: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--color-cyan); color: #06282d; font-size: 0.6em; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .flow-card.green .flow-num { background: var(--color-green); color: #06281c; }
+    .flow-card.amber .flow-num { background: var(--color-amber); color: #2d1c02; }
+    .flow-card h3 { margin: 4px 0 2px; font-size: 0.7em; }
+    .flow-card .src { font-family: var(--font-mono); font-size: 0.48em; color: var(--color-dark-gray); display: block; margin-bottom: 8px; }
+    .flow-card ul { margin: 0; padding-left: 18px; font-size: 0.56em; color: var(--color-light-gray); line-height: 1.55; }
+    .flow-card li { margin-bottom: 4px; }
+    .flow-card li b { color: var(--color-white); }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.6em; background: var(--color-panel-2); border: 1px solid var(--color-border); }
+    .data-table th, .data-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; color: var(--color-light-gray); line-height: 1.45; }
+    .data-table th { background: #101839; color: var(--color-mid-gray); font-weight: 600; font-size: 0.85em; letter-spacing: 0.04em; text-transform: uppercase; }
+    [data-theme="light"] .data-table th { background: #e2e8f0; }
+    .data-table tr:last-child td { border-bottom: 0; }
+    .data-table td b { color: var(--color-white); }
+    .data-table code { background: rgba(62, 201, 214, 0.10); padding: 1px 5px; font-size: 0.95em; color: var(--color-cyan-2); font-family: var(--font-mono); }
+
+    .toolkit-table { width: 100%; border-collapse: collapse; font-size: 0.55em; background: var(--color-panel-2); border: 1px solid var(--color-border); }
+    .toolkit-table th, .toolkit-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .toolkit-table th { background: #101839; color: var(--color-mid-gray); font-weight: 600; font-size: 0.85em; letter-spacing: 0.04em; text-transform: uppercase; }
+    [data-theme="light"] .toolkit-table th { background: #e2e8f0; }
+    .toolkit-table tr:last-child td { border-bottom: 0; }
+    .toolkit-table td b { color: var(--color-white); }
+    .toolkit-table code { background: rgba(62, 201, 214, 0.10); padding: 1px 5px; font-size: 0.95em; color: var(--color-cyan-2); font-family: var(--font-mono); }
+
+    .aidlc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .aidlc-phase { background: var(--color-panel-2); border: 1px solid var(--color-border); border-top: 3px solid var(--color-cyan); padding: 12px 14px; }
+    .aidlc-phase.construction { border-top-color: var(--color-green); }
+    .aidlc-phase.operations { border-top-color: var(--color-amber); }
+    .aidlc-phase h3 { margin: 0 0 1px; font-size: 0.72em; color: var(--color-white); display: flex; align-items: center; gap: 8px; }
+    .aidlc-phase .ph-num { flex: 0 0 auto; width: 1.55em; height: 1.55em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7em; font-weight: 700; color: #0a1222; background: var(--color-cyan); }
+    .aidlc-phase.construction .ph-num { background: var(--color-green); }
+    .aidlc-phase.operations .ph-num { background: var(--color-amber); }
+    .aidlc-phase .ph-sub { font-size: 0.5em; color: var(--color-mid-gray); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 8px; }
+    .aidlc-step { background: var(--color-panel-3); border: 1px solid var(--color-border-2); padding: 7px 10px; margin-bottom: 6px; }
+    .aidlc-step:last-child { margin-bottom: 0; }
+    .aidlc-step b { font-size: 0.58em; color: var(--color-cyan-2); display: block; }
+    .aidlc-step span { font-size: 0.52em; color: var(--color-light-gray); }
+    .aidlc-step .file { font-family: var(--font-mono); font-size: 0.5em; color: var(--color-mid-gray); display: block; margin-top: 1px; }
+
+    /* Clockwise lifecycle circle */
+    .cycle-wrap { position: relative; width: 920px; height: 470px; margin: 14px auto 0; }
+    .cycle-ring { position: absolute; left: 50%; top: 50%; width: 600px; height: 370px; border: 2px dashed var(--color-border-2); border-radius: 50%; transform: translate(-50%, -50%); }
+    .cycle-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; width: 240px; }
+    .cycle-center .arr { font-size: 1.7em; color: var(--color-cyan); line-height: 1; display: block; }
+    .cycle-center b { display: block; font-size: 0.62em; color: var(--color-white); margin-top: 4px; }
+    .cycle-center span { display: block; font-size: 0.48em; color: var(--color-mid-gray); margin-top: 3px; line-height: 1.4; }
+    .cycle-node { position: absolute; transform: translate(-50%, -50%); width: 212px; background: var(--color-panel-2); border: 1px solid var(--color-border); border-left: 3px solid var(--color-cyan); padding: 8px 11px; box-sizing: border-box; }
+    .cycle-node.purple { border-left-color: var(--color-purple); }
+    .cycle-node.green { border-left-color: var(--color-green); }
+    .cycle-node.amber { border-left-color: var(--color-amber); }
+    .cycle-node b { display: flex; align-items: center; gap: 7px; font-size: 0.56em; color: var(--color-white); }
+    .cycle-node .cn { flex: 0 0 auto; width: 19px; height: 19px; border-radius: 50%; background: var(--color-cyan); color: #06282d; font-size: 0.82em; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+    .cycle-node.purple .cn { background: var(--color-purple); color: #fff; }
+    .cycle-node.green .cn { background: var(--color-green); color: #06281c; }
+    .cycle-node.amber .cn { background: var(--color-amber); color: #2d1c02; }
+    .cycle-node .d { font-size: 0.5em; color: var(--color-mid-gray); display: block; margin-top: 3px; line-height: 1.4; }
+    .cycle-node .f { font-family: var(--font-mono); font-size: 0.44em; color: var(--color-cyan-2); display: block; margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--color-border-2); line-height: 1.35; }
+    .cycle-node.purple .f { color: #c4b5fd; }
+    [data-theme="light"] .cycle-node.purple .f { color: var(--color-purple); }
+    .cycle-node.green .f { color: var(--color-green); }
+    .cycle-node.amber .f { color: var(--color-amber); }
+
+    .cover-wrap { display: flex; flex-direction: column; justify-content: center; height: 100%; max-width: 1040px; }
+    .cover-wrap h1 { font-size: 1.85em; line-height: 1.06; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    .cover-wrap h2 { font-size: 0.95em; margin: 0 0 0.8rem; color: var(--color-cyan); font-weight: 500; }
+    .cover-sub { font-size: 0.72em; font-weight: 500; color: var(--color-mid-gray); margin: 0 0 22px; line-height: 1.4; }
+    .cover-cards { display: flex; gap: 16px; margin-bottom: 22px; }
+    .cover-card { flex: 1; display: flex; align-items: center; gap: 13px; background: var(--color-panel-2); border: 1px solid var(--color-border); border-left: 3px solid var(--color-cyan); padding: 14px 17px; }
+    .cover-card.purple { border-left-color: var(--color-purple); }
+    .cover-card.purple iconify-icon { color: var(--color-purple); }
+    .cover-card.green { border-left-color: var(--color-green); }
+    .cover-card.green iconify-icon { color: var(--color-green); }
+    .cover-card iconify-icon { font-size: 1.8em; color: var(--color-cyan); flex: 0 0 auto; }
+    .cover-card h4 { margin: 0; font-size: 0.62em; color: var(--color-white); }
+    .cover-card p { margin: 2px 0 0; font-size: 0.5em; color: var(--color-mid-gray); }
+    .cover-badges { display: flex; flex-wrap: wrap; gap: 9px; }
+    .cover-badges .pill-tag { font-size: 0.5em; padding: 4px 11px; }
+
+    .pill-tag { display: inline-block; font-size: 0.85em; padding: 1px 7px; background: rgba(62, 201, 214, 0.14); color: var(--color-cyan-2); border: 1px solid rgba(62, 201, 214, 0.4); letter-spacing: 0.04em; font-weight: 600; }
+
+    .emphasis-box { background: rgba(62, 201, 214, 0.10); border: 1px solid rgba(62, 201, 214, 0.4); border-left: 3px solid var(--color-cyan); padding: 10px 14px; margin-top: 12px; font-size: 0.56em; color: var(--color-light-gray); line-height: 1.5; }
+    .emphasis-box b, .emphasis-box strong { color: var(--color-cyan-2); }
+    .emphasis-box.green { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.4); border-left-color: var(--color-green); }
+    .emphasis-box.green b, .emphasis-box.green strong { color: var(--color-green); }
+    .emphasis-box.amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.4); border-left-color: var(--color-amber); }
+    .emphasis-box.amber b, .emphasis-box.amber strong { color: var(--color-amber); }
+
+    .step-list { list-style: none; margin: 0; padding: 0; }
+    .step-list li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--color-border-2); }
+    .step-list li:last-child { border-bottom: 0; }
+    .step-list .n { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: var(--color-purple); color: #fff; font-size: 0.55em; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+    .step-list .t { font-size: 0.56em; color: var(--color-light-gray); line-height: 1.45; }
+    .step-list .t b { color: var(--color-white); }
+    .step-list .t code { background: rgba(139,92,246,0.14); color: #c4b5fd; padding: 0 5px; font-family: var(--font-mono); font-size: 0.95em; }
+
+    .gloss-note { font-size: 0.5em; color: var(--color-light-gray); margin-top: 10px; line-height: 1.45; border-left: 3px solid var(--color-cyan); padding: 6px 12px; background: rgba(62,201,214,0.06); }
+    .gloss-src { font-size: 0.42em; color: var(--color-dark-gray); margin-top: 6px; }
+    .refs { font-size: 0.4em; color: var(--color-mid-gray); margin-top: 12px; line-height: 1.7; }
+    .refs b { color: var(--color-light-gray); font-weight: 600; }
+    .refs a { color: var(--color-cyan); text-decoration: none; }
+    .refs a:hover { text-decoration: underline; }
+    .refs .sep { color: var(--color-border); margin: 0 8px; }
+
+    /* Global footer — one element, fixed outside Reveal's scaling transform,
+       shared by every slide. Page numbers are computed at load time from
+       whichever slides are not data-hidden; see DECK_CONFIG in the script
+       at the bottom of <body>. */
+    .deck-footer {
+      position: fixed; left: 44px; right: 44px; bottom: 18px; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--color-dark-gray); font-family: var(--font-primary);
+    }
+    .deck-footer .footer-links { display: flex; align-items: center; gap: 12px; }
+    .deck-footer .footer-links a { color: var(--color-dark-gray); display: inline-flex; align-items: center; text-decoration: none; transition: color 0.15s ease; }
+    .deck-footer .footer-links a:hover { color: var(--color-cyan); }
+    .deck-footer .footer-links iconify-icon { font-size: 15px; }
+
+    /* Code editor chrome ("Monaco-style" panel) — always a dark editor
+       background, even in light theme, so a code panel reads as a code
+       editor window rather than a themed content card. */
+    .editor-window { border: 1px solid var(--color-border); background: #060a18; overflow: hidden; }
+    [data-theme="light"] .editor-window { background: #0f172a; }
+    .editor-titlebar { display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: #0c1226; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    [data-theme="light"] .editor-titlebar { background: #111c3d; }
+    .editor-dots { display: flex; gap: 6px; flex: 0 0 auto; }
+    .editor-dots span { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .editor-dots span:nth-child(1) { background: #ff5f57; }
+    .editor-dots span:nth-child(2) { background: #febc2e; }
+    .editor-dots span:nth-child(3) { background: #28c840; }
+    .editor-filename { font-family: var(--font-mono); font-size: 11px; color: #8fa0c8; margin-left: 4px; }
+    .editor-window .codepanel { border: 0; }
+
+    .highlight-cyan { color: var(--color-cyan); }
+    .highlight-green { color: var(--color-green); }
+    .highlight-amber { color: var(--color-amber); }
+    .highlight-red { color: var(--color-red); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+    <iconify-icon icon="mdi:weather-night"></iconify-icon>
+  </button>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==========================================
+           SLIDE 1: Cover
+           ========================================== -->
+      <section class="slide-brand" data-section="Cover">
+        <div class="cover-wrap">
+          <span class="kicker">AI-Driven Development Lifecycle &middot; A Story Everyone Knows</span>
+          <h1>AI-DLC In Practice: agent-job-matcher</h1>
+          <h2>From a Vibe-Coded Prototype to a Standalone, Multi-Surface Reference Implementation</h2>
+          <p class="cover-sub">One synthetic resume. Four real job postings, two that fail on purpose. This deck follows <b style="color:var(--color-cyan);">agent-job-matcher</b> &mdash; the third generation of this idea &mdash; through every AI-DLC step: an Inception gate that absorbed <b style="color:var(--color-cyan);">seven owner revisions</b> before any code, ten Construction bolts, evals that run as plain <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">pytest</code>, and a system with exactly <b style="color:var(--color-cyan);">two LLM calls</b> in its entire architecture.</p>
+
+          <div class="cover-cards">
+            <div class="cover-card">
+              <iconify-icon icon="mdi:account-search"></iconify-icon>
+              <div>
+                <h4>Two Prototypes Behind It</h4>
+                <p>talent-align &rarr; job-matcher (Eve/TS) &rarr; this repo</p>
+              </div>
+            </div>
+            <div class="cover-card purple">
+              <iconify-icon icon="mdi:gate"></iconify-icon>
+              <div>
+                <h4>Gates &amp; Ceremonies</h4>
+                <p>Inception &rarr; Construction &rarr; Operations, via openspec</p>
+              </div>
+            </div>
+            <div class="cover-card green">
+              <iconify-icon icon="mdi:test-tube"></iconify-icon>
+              <div>
+                <h4>Evals As Pytest</h4>
+                <p>120+ offline &middot; 11 live &middot; HARD/SOFT rubric</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="cover-badges">
+            <span class="pill-tag">Score From Code, Never LLM</span>
+            <span class="pill-tag">CLI &middot; REST &middot; Python &middot; MCP &middot; Chat</span>
+            <span class="pill-tag">Exactly Two LLM Calls</span>
+            <span class="pill-tag">SSRF &amp; Injection Guarded</span>
+            <span class="pill-tag">4 Telemetry Backends, Env-Selected</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 2: The Story
+           ========================================== -->
+      <section class="slide-brand" data-section="The Story">
+        <span class="kicker"><span class="ph">The Story</span> A Night Of Job Hunting, Four Ways In</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">One resume, four doors: which jobs fit me best?</h1>
+        <p class="lede">The example is unchanged from the earlier decks in this series &mdash; everyone has looked for a job or hired for one. What changed is how many ways you can now ask the question.</p>
+
+        <div class="flow-row" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="flow-card">
+            <span class="flow-num">1</span>
+            <h3>The inputs</h3>
+            <span class="src">1 synthetic resume + real job postings</span>
+            <ul>
+              <li>A two-page <b>synthetic resume</b> &mdash; Jordan Rivera, a fictional data-platform / governance / GenAI-architecture profile. The owner's real resume stays local-only, gitignored: <b>this repo is public</b>.</li>
+              <li>Four real postings captured 2026-07-09 and carried over verbatim: <b>Anthropic</b>, <b>Bain</b>, <b>Gusto</b>, <b>Temporal</b> &mdash; plus two that fail on purpose: <b>ADP</b> and <b>Ashby/Jerry.ai</b>.</li>
+              <li>Ask it four ways: <code style="font-family:var(--font-mono);">jobmatch analyze</code>, <code style="font-family:var(--font-mono);">POST /analyze</code>, a Python import, or a chat message.</li>
+            </ul>
+          </div>
+          <div class="flow-card amber">
+            <span class="flow-num">2</span>
+            <h3>What the agent does</h3>
+            <span class="src">backend/job_matcher/ &mdash; no agent runtime, no orchestration loop</span>
+            <ul>
+              <li>Loads the resume once, then spawns <b>one end-to-end async task per job</b> &mdash; fetch &rarr; analyze &rarr; score &rarr; report &mdash; bounded by <code style="font-family:var(--font-mono);">JOB_FANOUT_CONCURRENCY</code>.</li>
+              <li>The one LLM call per job reports <b>matched/missing skills with an exact quote from the resume as evidence</b>. It cannot invent experience or emit a number.</li>
+              <li>A <b>tool (plain code)</b> computes the 100-point score: required 40 &middot; preferred 20 &middot; experience 20 &middot; domain 20.</li>
+            </ul>
+          </div>
+          <div class="flow-card green">
+            <span class="flow-num">3</span>
+            <h3>What comes back</h3>
+            <span class="src">runs/&lt;ts&gt;/ (CLI) or the response body (API) &mdash; same typed array</span>
+            <ul>
+              <li>One typed <code style="font-family:var(--font-mono);">JobOutcome</code> per job &mdash; report or fetch failure &mdash; <b>the same array on disk or in an HTTP response</b>.</li>
+              <li>A <b>ranking.md</b> across jobs, plus new since this repo: a <b>JSON Resume</b> conversion and a rendered <b>cover letter</b> for the top pick.</li>
+              <li>The honest part, carried over unchanged: <b>two links fail</b> &mdash; ADP and Ashby need JavaScript. Logged, marked failed, <b>no retry, no fake analysis</b>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="emphasis-box">
+          <b>Why this example still teaches well:</b> the problem needs no explanation and the failures are real. What's new is that the same story now has four doors in &mdash; a terminal, an HTTP client, a Python import, or a chat message &mdash; so this deck can show one architecture serving every access pattern, not one runtime serving one story.
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 3: The Before(s) — three generations
+           ========================================== -->
+      <section class="slide-brand" data-section="The Before">
+        <span class="kicker"><span class="ph">The Before</span> Two Prototypes Back</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Three generations, one idea maturing each time</h1>
+        <p class="lede">talent-align proved the idea. The Eve rebuild (<code style="font-family:var(--font-mono);color:var(--color-cyan-2);">ai-agents/agents/job-matcher/</code>) proved the <i>design</i>. This repo keeps the design and drops the runtime it was proved on.</p>
+
+        <div class="panel" style="padding:0;overflow:hidden;margin-top:10px;">
+          <table class="data-table" style="margin:0;border:0;">
+            <thead>
+              <tr><th style="width:19%;"></th><th style="width:27%;">talent-align (prototype)</th><th style="width:27%;">job-matcher (Eve/TS reference)</th><th style="width:27%;">agent-job-matcher (this repo)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>Requirements</b></td><td>A markdown summary of a chat</td><td><code>proposal.md</code> + <code>spec.md</code> SHALL rules</td><td>Same lifecycle, ported &mdash; <b class="highlight-amber">7 owner revisions</b> logged before approval</td></tr>
+              <tr><td><b>Scoring</b></td><td class="highlight-red">LLM does the math in the prompt</td><td class="highlight-green">Code tool computes it (<code>scoring.ts</code>)</td><td class="highlight-green">Behaviour-identical port (<code>scoring.py</code>) &mdash; even JS <code>Math.round</code> semantics kept on purpose</td></tr>
+              <tr><td><b>Runtime</b></td><td>Streamlit + hard-coded candidate info</td><td>Eve orchestrator + <code>job-analyst</code> subagent</td><td>Plain async Python &mdash; <b>no agent runtime at all</b></td></tr>
+              <tr><td><b>LLM operations</b></td><td>1, ad hoc, untyped</td><td>1, typed extraction only</td><td><b class="highlight-cyan">Exactly 2</b>, system-wide, enforced by design (ADR 0001)</td></tr>
+              <tr><td><b>Quality</b></td><td>Looking at results in a browser</td><td>8 evals on real data, pass rules before code</td><td><code>pytest</code>: 120+ offline + 11 live, same HARD/SOFT rubric</td></tr>
+              <tr><td><b>Access surfaces</b></td><td>One (Streamlit)</td><td>One (chat, no GUI)</td><td><b>Four</b>: CLI &middot; REST &middot; Python import &middot; MCP/chat</td></tr>
+              <tr><td><b>Observability</b></td><td>None</td><td>1 OTel trace/job, 2 backends</td><td>AOP decorators, <b>4 backends</b> selectable purely by env</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="emphasis-box green">
+          <b>The lineage is explicit, not implied</b> &mdash; <code style="font-family:var(--font-mono);">openspec/project.md</code> states it directly: <i>"job-matcher's core features, eval datasets, rubrics, and deterministic scoring logic are the reference design for this project. We are not keeping the Eve runtime; we are porting the ideas to a pythonic, CLI-triggered backend."</i> Neither ancestor is a mistake &mdash; each one is the "before" picture the next gate improved on.
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 4: The Method — phases, ceremonies, roles
+           ========================================== -->
+      <section class="slide-brand" data-section="The Method">
+        <span class="kicker"><span class="ph">The Method</span> Ceremonies By Role</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Three phases, one gate that took seven passes to close</h1>
+        <p class="lede">The team is still small &mdash; one human owner, one AI wearing role hats per ceremony &mdash; but the scope grew, so the gate did too. Every ceremony still produces its own reviewable file.</p>
+
+        <div class="aidlc-grid">
+          <div class="aidlc-phase">
+            <h3><span class="ph-num">1</span> Inception</h3>
+            <p class="ph-sub">Understand before building</p>
+            <div class="aidlc-step"><b>Intent capture &middot; Owner + Business Analyst</b><span>Rebuild talent-align as a standalone Python product, modeled on <code>privacyshield</code></span><span class="file">the owner's own words</span></div>
+            <div class="aidlc-step"><b>Mob Elaboration &middot; BA, Architect, Eval Engineer</b><span>Seven dated revisions &mdash; scope grew from "CLI + REST" to "+ JSON Resume, MCP, chat, cover letters"</span><span class="file">proposal.md &middot; design.md &middot; spec.md &middot; tasks.md</span></div>
+            <div class="aidlc-step"><b>Inception Gate <iconify-icon icon="mdi:gate" style="vertical-align:-2px;"></iconify-icon> &middot; Owner</b><span>Hard gate &mdash; six open questions resolved before Bolt 1 starts</span><span class="file">openspec/changes/add-job-matcher-cli/ &rarr; APPROVED 2026-07-11</span></div>
+          </div>
+          <div class="aidlc-phase construction">
+            <h3><span class="ph-num">2</span> Construction</h3>
+            <p class="ph-sub">Build in bolts, log corrections</p>
+            <div class="aidlc-step"><b>Mob Construction &middot; AI Eng + Eval Eng</b><span>Eleven bolts (0&ndash;10), evals first; every change of plan is a dated <b>Correction:</b> entry</span><span class="file">tasks.md checkboxes</span></div>
+            <div class="aidlc-step"><b>Security Baseline &middot; Security role + Owner</b><span>Attack the untrusted inputs; SSRF blocklist + injection-proof schema</span><span class="file">design.md &rarr; Fetch guards + schema notes</span></div>
+            <div class="aidlc-step"><b>Verification &middot; QA + Owner</b><span>Offline + live pytest green; band table recalibrated against the synthetic profile</span><span class="file">evals/rubrics.md &middot; runs/ artifacts</span></div>
+          </div>
+          <div class="aidlc-phase operations">
+            <h3><span class="ph-num">3</span> Operations</h3>
+            <p class="ph-sub">Watch, measure, learn</p>
+            <div class="aidlc-step"><b>Operations Review &middot; Ops role + Owner</b><span>Traces reviewed across up to 4 active backends; mini-tier cost policy</span><span class="file">OpenObserve / Phoenix / Arize AX</span></div>
+            <div class="aidlc-step"><b>Next Intent</b><span>frontend/, auth, rate limiting &mdash; explicitly deferred, not forgotten</span><span class="file">a new openspec/changes/&lt;name&gt;/</span></div>
+          </div>
+        </div>
+
+        <div class="pipeline">
+          <div class="pipe-step done"><span class="pipe-chip">proposed</span></div>
+          <div class="pipe-gate"><iconify-icon icon="mdi:gate" style="vertical-align:-2px;"></iconify-icon></div>
+          <div class="pipe-step done"><span class="pipe-chip">approved</span></div>
+          <div class="pipe-gate">&rarr;</div>
+          <div class="pipe-step done"><span class="pipe-chip">implemented</span></div>
+          <div class="pipe-gate">&rarr;</div>
+          <div class="pipe-step current"><span class="pipe-chip">verified</span></div>
+          <div class="pipe-gate">&rarr;</div>
+          <div class="pipe-step"><span class="pipe-chip">archived</span></div>
+        </div>
+        <span class="pipe-note"><b>One YAML-tracked status field carries the whole lifecycle.</b> All ten Bolts are implemented and the HARD eval sweep is green; <code style="font-family:var(--font-mono);">verified</code> is waiting on two owner manual-evidence items &mdash; a Claude Desktop mount and a real chatbot UI run &mdash; before archive.</span>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 5: The Cycle — clockwise lifecycle
+           ========================================== -->
+      <section class="slide-brand" data-section="The Cycle">
+        <span class="kicker"><span class="ph">The Method</span> The Cycle</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">The lifecycle is a circle, not a straight line</h1>
+        <p class="lede">Read it clockwise from the top. One full circle = one change (one <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">openspec/changes/&lt;name&gt;/</code> folder). What Operations teaches you becomes the next Intent &mdash; and the circle starts again.</p>
+
+        <div class="cycle-wrap">
+          <div class="cycle-ring"></div>
+          <div class="cycle-center">
+            <span class="arr">&#8635;</span>
+            <b>AI-DLC</b>
+            <span>runs clockwise<br>one loop = one change</span>
+          </div>
+
+          <div class="cycle-node" style="left:460px;top:52px;">
+            <b><span class="cn">1</span> Intent</b>
+            <span class="d">The owner states the goal in plain words</span>
+            <span class="f">&#9656; the intent paragraph</span>
+          </div>
+          <div class="cycle-node" style="left:695px;top:125px;">
+            <b><span class="cn">2</span> Mob Elaboration</b>
+            <span class="d">AI + owner write the plan files &mdash; seven revisions here</span>
+            <span class="f">&#9656; proposal &middot; design &middot; spec &middot; tasks</span>
+          </div>
+          <div class="cycle-node purple" style="left:752px;top:281px;">
+            <b><span class="cn">3</span> Inception Gate <iconify-icon icon="mdi:gate" style="vertical-align:-2px;"></iconify-icon></b>
+            <span class="d">Owner approves. No code before this.</span>
+            <span class="f">&#9656; six open questions, all resolved</span>
+          </div>
+          <div class="cycle-node green" style="left:590px;top:407px;">
+            <b><span class="cn">4</span> Mob Construction</b>
+            <span class="d">Build in Bolts &mdash; evals first, then code</span>
+            <span class="f">&#9656; Bolts 0&ndash;10 &middot; tasks.md &#10003;</span>
+          </div>
+          <div class="cycle-node green" style="left:330px;top:407px;">
+            <b><span class="cn">5</span> Secure &amp; Verify</b>
+            <span class="d">Attack it, then run the live sweep</span>
+            <span class="f">&#9656; SSRF/injection notes &middot; pytest -m live</span>
+          </div>
+          <div class="cycle-node amber" style="left:168px;top:281px;">
+            <b><span class="cn">6</span> Operations</b>
+            <span class="d">Watch traces, cost, and behavior</span>
+            <span class="f">&#9656; up to 4 backends &middot; mini-tier cost</span>
+          </div>
+          <div class="cycle-node amber" style="left:226px;top:125px;">
+            <b><span class="cn">7</span> Next Intent</b>
+            <span class="d">What we learned starts the next loop</span>
+            <span class="f">&#9656; frontend/, auth &mdash; a new changes/ folder</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 6: AI-DLC Glossary (shared across decks)
+           ========================================== -->
+      <section class="slide-brand" data-section="Glossary">
+        <span class="kicker"><span class="ph">Reference</span> Shared Across Every Deck In This Series</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">AI-DLC glossary &mdash; the vocabulary behind every agent this repo builds</h1>
+        <p class="lede">AI-DLC renames the Agile ceremonies for AI-speed execution. Same seven terms as the AI SDET Workbench deck &mdash; one vocabulary, reused on purpose.</p>
+
+        <div class="panel" style="padding:0;overflow:hidden;">
+          <table class="toolkit-table" style="margin:0;">
+            <thead>
+              <tr><th style="width:18%;">Term</th><th style="width:40%;">What it means</th><th style="width:42%;">In agent-job-matcher</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="color:var(--color-cyan);font-weight:600;">Intent</td><td>High-level goal in plain language &mdash; the single seed.</td><td><em>"Rebuild talent-align as a standalone Python product, CLI-triggered, modeled on privacyshield."</em></td></tr>
+              <tr><td style="color:var(--color-cyan);font-weight:600;">Mob elaboration</td><td>Inception ritual: AI drafts questions and plans; the owner validates and corrects.</td><td>Seven dated revisions to <code>proposal.md</code> before Bolt 1 ever started.</td></tr>
+              <tr><td style="color:var(--color-purple);font-weight:600;">Unit of work</td><td>Independently buildable slice. Replaces the Agile <em>epic</em>.</td><td>One <code>tasks.md</code> checkbox &mdash; e.g. "<code>fetch.py</code>: SSRF blocklist + byte cap."</td></tr>
+              <tr><td style="color:var(--color-purple);font-weight:600;">Mob construction</td><td>Construction ritual: AI proposes design, code &amp; tests; human pairs and approves.</td><td>Owner reviews each Bolt's diff before the next one starts.</td></tr>
+              <tr><td style="color:var(--color-amber);font-weight:600;">Bolt</td><td>Lightning iteration in hours, not weeks. Replaces the Agile <em>sprint</em>.</td><td>Bolt 3 &mdash; generative step + pipeline + CLI, built and green in one sitting.</td></tr>
+              <tr><td style="color:var(--color-green);font-weight:600;">Deployment unit</td><td>Construction's finished output: validated, tested, packaged.</td><td>A green <code>pytest</code> suite plus the <code>ghcr.io/senthilsweb/agent-job-matcher</code> image.</td></tr>
+              <tr><td style="color:var(--color-green);font-weight:600;">Production / Operations</td><td>Units run for real; results feed the next Intent cycle.</td><td>Telemetry across active backends &rarr; the band table recalibration &rarr; next change.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="gloss-note">
+          <iconify-icon icon="mdi:lightbulb-on"></iconify-icon>
+          AI-DLC doesn't bolt AI onto Agile &mdash; it rebuilds the SDLC from first principles: <em>"we need automobiles, not faster horse chariots."</em> AI does the execution; humans stay accountable for every decision.
+        </div>
+        <div class="gloss-src">Source: AWS AI-DLC Method Definition Paper &mdash; Raja SP, AWS</div>
+
+        <div class="refs">
+          <b>References &mdash; concepts &amp; sibling decks:</b>
+          <a href="https://prod.d13rzhkk8cj2z0.amplifyapp.com/" target="_blank" rel="noopener">AI-DLC</a><span class="sep">&middot;</span><a href="https://specs.md/" target="_blank" rel="noopener">specs.md</a><span class="sep">&middot;</span><a href="https://github.com/senthilsweb/ai-agents" target="_blank" rel="noopener">ai-agents repo</a><span class="sep">&middot;</span>sibling deck: <a href="https://github.com/senthilsweb/ai-agents/blob/main/ai-sdet-workbench/index.html" target="_blank" rel="noopener">AI SDET Workbench</a>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 7: Inception — seven revisions
+           ========================================== -->
+      <section class="slide-brand" data-section="Inception">
+        <span class="kicker ph-gate"><span class="ph">Inception</span> Seven Revisions, Zero Code</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Seven owner revisions reshaped the design <span class="highlight-cyan">before any code was written</span></h1>
+        <p class="lede"><code style="font-family:var(--font-mono);color:var(--color-cyan-2);">proposal.md</code> for <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">add-job-matcher-cli</code> was revised seven times during elaboration. Every revision is a dated, logged decision &mdash; scope grew in the open, not by drift.</p>
+
+        <div class="twocol" style="margin-top:12px;">
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:file-document-multiple"></iconify-icon> The elaboration files</h3>
+            <ul>
+              <li><b>proposal.md</b> &mdash; why, what changes, acceptance criteria, and a full <b>revision log</b> the owner kept adding to</li>
+              <li><b>design.md</b> &mdash; architecture, pipeline, package layout, three access surfaces, non-goals</li>
+              <li><b>tasks.md</b> &mdash; Bolt 0 (inception) + ten Construction bolts, evals-first order</li>
+              <li><b>spec.md</b> &mdash; the <code>job-matcher-cli</code> capability spec, 16 acceptance criteria each mapped to an eval</li>
+            </ul>
+            <div class="emphasis-box" style="margin-top:10px;">
+              <b>Six open questions were resolved by the owner</b> before Bolt 1: LLM library (pydantic-ai), CLI framework (Typer), the resume-fixture decision, the rounding convention, the observability backend, and the API execution model.
+            </div>
+          </div>
+          <div class="panel" style="padding:0;overflow:hidden;">
+            <table class="toolkit-table" style="margin:0;">
+              <thead><tr><th style="width:14%;">Rev</th><th>What it changed</th></tr></thead>
+              <tbody>
+                <tr><td><b>2</b></td><td>+ FastAPI surface; AOP-style decorator instrumentation for observability</td></tr>
+                <tr><td><b>3</b></td><td>Dropped run-browsing endpoints as an "Eve-ism"; OpenObserve over REST; mandatory structlog + file-header convention; fan-out made per-job, end-to-end async; result made a typed JSON array</td></tr>
+                <tr><td><b>4</b></td><td>Reversed rev 3's "no OTel SDK" &mdash; Arize AX + Phoenix + OpenObserve-via-OTLP all required, confined to an optional <code>[otel]</code> extra</td></tr>
+                <tr><td><b>5</b></td><td>+ JSON Resume extraction (Bolt 6); MCP server pulled in from roadmap (Bolt 7)</td></tr>
+                <tr><td><b>6</b></td><td>+ agent-service chat bridge (Bolt 8) &mdash; reverses rev 5's "MCP code only"; system now has exactly two LLM operations (ADR 0001)</td></tr>
+                <tr><td><b>7</b></td><td>+ cover-letter rendering with a shipped default template; candidate identity extracted deterministically &mdash; never a third LLM call</td></tr>
+              </tbody>
+            </table>
+            <div class="emphasis-box amber" style="margin:10px 12px 12px;">
+              <b>Why the gate saves money:</b> every one of these seven corrections is a paragraph in markdown. The same correction after Bolt 8 was built would mean rewriting the MCP bridge, the chat contract, and the observability wiring.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 8: What is a Bolt? — 11 bolts this time
+           ========================================== -->
+      <section class="slide-brand" data-section="Bolts">
+        <span class="kicker ph-construction"><span class="ph">Construction</span> What Is A Bolt?</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">A Bolt is AI-DLC's sprint &mdash; <span class="highlight-green">hours, not weeks</span></h1>
+        <p class="lede">Same definition as every deck in this series. <b style="color:var(--color-light-gray);">Unit of work</b> = one checkbox in tasks.md &middot; <b style="color:var(--color-light-gray);">Bolt</b> = the checkboxes done in one sitting &middot; <b style="color:var(--color-light-gray);">Gate</b> = human permission. This time the scope needed eleven of them.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:lightning-bolt"></iconify-icon> Three rules make it a Bolt</h3>
+            <ol class="step-list">
+              <li><span class="n">1</span><span class="t"><b>A complete slice, not a half-built layer.</b> When the Bolt ends, you have something that can be tested on its own.</span></li>
+              <li><span class="n">2</span><span class="t"><b>It ends in a stable state.</b> Code compiles, the new evals pass, and the owner reviews the slice before the next Bolt starts.</span></li>
+              <li><span class="n">3</span><span class="t"><b>Decisions get written down.</b> Anything changed mid-Bolt becomes a <code>**Correction:**</code> entry in tasks.md.</span></li>
+            </ol>
+            <div class="emphasis-box amber" style="margin-top:10px;">
+              <b>Contrast with the ancestors:</b> talent-align had no Bolts &mdash; one long chat built everything at once. Eve's job-matcher needed four. This repo needed <b>eleven</b> because the scope itself grew: three access surfaces, two LLM operations, four telemetry backends. Bolt discipline is what let scope grow without losing reviewability.
+            </div>
+          </div>
+          <div class="panel" style="padding:0;overflow:hidden;">
+            <table class="toolkit-table" style="margin:0;">
+              <thead><tr><th style="width:20%;">Bolt</th><th>The slice</th></tr></thead>
+              <tbody>
+                <tr><td><b>0 &middot; Inception</b></td><td>Six open questions resolved &mdash; pydantic-ai, Typer, synthetic resume, JS-rounding, telemetry, API model</td></tr>
+                <tr><td><b>1 &middot; Core</b></td><td><code>scoring.py</code>, <code>schemas.py</code> &mdash; no LLM, no network, no I/O</td></tr>
+                <tr><td><b>2 &middot; Inputs</b></td><td><code>resume.py</code> extraction + <code>fetch.py</code> guards (SSRF blocklist, one attempt)</td></tr>
+                <tr><td><b>3 &middot; Generative + CLI</b></td><td><code>config.py</code>, <code>analyze.py</code> (LLM-1), <code>pipeline.py</code>, <code>jobmatch</code> CLI</td></tr>
+                <tr><td><b>4 &middot; FastAPI</b></td><td><code>POST /analyze</code>, <code>GET /health</code> &mdash; no <code>/runs</code> endpoints, by design</td></tr>
+                <tr><td><b>5 &middot; Telemetry</b></td><td>OpenObserve REST sink + OTel bridge (Phoenix, Arize AX, OTLP)</td></tr>
+                <tr><td><b>6 &middot; JSON Resume</b></td><td>Second typed schema, same LLM-1 extraction pattern (revision 5)</td></tr>
+                <tr><td><b>7 &middot; MCP server</b></td><td><code>mcp/index.js</code> &mdash; three tools, stdio only, bridges to the REST API</td></tr>
+                <tr><td><b>8 &middot; Agent service</b></td><td><code>mcp/agent-service/</code> &mdash; LLM-2 chat orchestration, SSE, upload flow</td></tr>
+                <tr><td><b>9 &middot; Live evals</b></td><td><code>tests/live/</code> under <code>-m live</code>; band table recalibrated</td></tr>
+                <tr><td><b>10 &middot; Cover letter</b></td><td><code>candidate.py</code> (deterministic identity) + shipped default template</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 9: Construction — architecture, two LLM calls
+           ========================================== -->
+      <section class="slide-brand" data-section="Construction">
+        <span class="kicker ph-construction"><span class="ph">Construction</span> Architecture</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Two LLM calls in the whole system &mdash; everything else is plain code</h1>
+        <p class="lede">By design (<a href="https://github.com/senthilsweb/agent-job-matcher/blob/main/openspec/adr/0001-agent-service-chat-bridge.md" target="_blank" rel="noopener" style="color:var(--color-cyan-2);">ADR 0001</a>): <b>LLM-1</b> is typed extraction inside the core; <b>LLM-2</b> is chat-tool orchestration inside the agent service. Neither may emit a score.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="editor-window">
+            <div class="editor-titlebar">
+              <span class="editor-dots"><span></span><span></span><span></span></span>
+              <span class="editor-filename">pipeline &middot; one request, N jobs</span>
+            </div>
+            <div class="codepanel">jobmatch analyze --resume R --job J1 --job J2 ...   <span class="cmt">(or POST /analyze)</span>
+        │
+<span class="cmd">mint run_id → extract_resume_text(R)</span>   <span class="cmt">(once; fails fast on scanned PDF / .doc)</span>
+        │
+<span class="acc">spawn ONE end-to-end async task PER JOB</span>   <span class="cmt">(bounded by JOB_FANOUT_CONCURRENCY, default 3)</span>
+   task(J_i):  fetch(J_i)            <span class="cmt">(guards; exactly one attempt)</span>
+                 │ fail → log, emit JobFetchFailure, task ends — siblings unaffected
+                 ▼
+               analyze(resume, job_text)   <span class="acc">← the only per-job LLM call</span>
+               score_job_fit(analysis)     <span class="ok">(deterministic)</span>
+        │
+<span class="cmd">gather all outcomes → list[JobOutcome]</span>   <span class="ok">the typed JSON array, every surface</span>
+CLI → runs/&lt;ts&gt;/ + ranking.md    API → same array as the response body, nothing persisted</div>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:call-split"></iconify-icon> Why fan-out changed shape from Eve</h3>
+            <ul>
+              <li>Eve needed an N=1 vs N&gt;1 fork &mdash; spawning a subagent had a real cost, so one job ran direct and many jobs ran through <code>job-analyst</code>.</li>
+              <li><b>Asyncio tasks have no such cliff.</b> This repo fans out identically for 1 job or 50 &mdash; there is no fork in kind, only a gather of tasks.</li>
+              <li><b>Four surfaces, one service layer</b>: CLI (<code>cli.py</code>, Typer) &middot; REST (<code>api.py</code>, FastAPI &mdash; <code>/analyze</code>, <code>/resume/jsonresume</code>, <code>/health</code>, no <code>/runs</code>) &middot; embeddable core (<code>from job_matcher import ...</code>) &middot; MCP + chat.</li>
+            </ul>
+            <div class="emphasis-box green" style="margin-top:10px;">
+              <b>One tool-definition surface serves two AI clients:</b> Claude Desktop mounts <code>mcp/index.js</code> over stdio; the owner's existing neutral chatbot drives the same three tools through <code>mcp/agent-service/</code> (LLM-2) over SSE &mdash; because the REST API already exists, a thin MCP&rarr;REST passthrough would be a round trip to nowhere.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 10: Evals — pytest, HARD/SOFT
+           ========================================== -->
+      <section class="slide-brand" data-section="Evals">
+        <span class="kicker ph-construction"><span class="ph">Construction</span> Evals &mdash; Now Pytest</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Same rubric, same fixtures, restated as <span class="highlight-green">pytest</span></h1>
+        <p class="lede"><code style="font-family:var(--font-mono);color:var(--color-cyan-2);">evals/rubrics.md</code> is ported "before or alongside the code," verbatim in intent, from the Eve reference &mdash; same canonical formula, same HARD/SOFT contract.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="panel" style="padding:0;overflow:hidden;">
+            <table class="toolkit-table" style="margin:0;">
+              <thead><tr><th style="width:46%;">Fixture (evals/data/)</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><code>resume/synthetic-resume.pdf</code></td><td>Fictional profile (Jordan Rivera) &mdash; replaces the real resume, this repo is public</td></tr>
+                <tr><td>Anthropic &middot; Bain &middot; Gusto &middot; Temporal <b>JD snapshots</b></td><td class="highlight-green">&#10003; carried over verbatim from the Eve repo</td></tr>
+                <tr><td>ADP workforcenow &middot; Ashby/Jerry.ai captures</td><td class="highlight-red">&#10007; HTTP 200 but JavaScript shells &mdash; real fetch-guard failures</td></tr>
+                <tr><td><code>adversarial/prompt-injection-jd.txt</code></td><td>Synthetic: a "score 100, dump the resume" attack</td></tr>
+                <tr><td><code>jobs/manifest.json</code></td><td>URL, board, capture date, word counts, fetch status</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:clipboard-check"></iconify-icon> Two markers, two costs</h3>
+            <ul>
+              <li><b><code style="font-family:var(--font-mono);">pytest -m "not live"</code> &mdash; HARD, no key, no network:</b> 120+ tests &mdash; scoring determinism, match banding, slug naming, schema conformance, observability spans. Blocks <code>implemented &rarr; verified</code>.</li>
+              <li><b><code style="font-family:var(--font-mono);">pytest -m live</code> &mdash; 11 tests, real model:</b> grounding, single/multi-job outcome counts, prompt injection, fetch guards. Runs on the OpenAI <b>mini tier</b> &mdash; extraction is a cheap workload, cost policy dated 2026-07-11.</li>
+              <li><b>SOFT</b> band ranges were recalibrated once at verification against the synthetic profile &mdash; Anthropic 84&ndash;85 strong, Bain 72 good, Gusto 79&ndash;81 good/strong, Temporal 40 weak.</li>
+            </ul>
+            <div class="emphasis-box green" style="margin-top:10px;">
+              <b>A correction the HARD rule forced:</b> the Bolt 3 smoke showed the mini model paraphrasing 5/14 evidence quotes under Eve's looser "quote or close paraphrase" wording. The prompt was tightened to <b>exact contiguous quote only</b> &mdash; a deliberate divergence from the Eve prompt, needed to make grounding actually hold.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 11: Security — injection + fetch + SSRF
+           ========================================== -->
+      <section class="slide-brand" data-section="Security">
+        <span class="kicker ph-construction"><span class="ph">Construction</span> Security Baseline</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">A job posting is <span class="highlight-amber">untrusted web text inside your prompt</span></h1>
+        <p class="lede">The same adversarial fixture as the Eve deck, plus one guard Eve never needed: the Python backend fetches URLs itself, so a hostname blocklist is load-bearing here.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:shield-lock"></iconify-icon> Prompt injection &mdash; structurally impossible, then tested</h3>
+            <ol class="step-list">
+              <li><span class="n">1</span><span class="t"><b>There is no score to inject.</b> <code>JobAnalysis</code> (Pydantic) has no field with "score" in its name &mdash; enforced by a HARD, grep-backed test, not a convention.</span></li>
+              <li><span class="n">2</span><span class="t"><b>Data, not instructions.</b> Job text arrives fenced and labeled as content to analyze, never as commands.</span></li>
+              <li><span class="n">3</span><span class="t"><b>Evidence is a trap for lies.</b> Every matched skill needs an exact resume quote, whitespace-normalized &mdash; invented matches fail grounding automatically.</span></li>
+              <li><span class="n">4</span><span class="t"><b>The attack ships with the repo.</b> <code>tests/live/test_prompt_injection.py</code> runs it on every live sweep.</span></li>
+            </ol>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:link-off"></iconify-icon> Network + link guards</h3>
+            <ul>
+              <li><b>Exactly one fetch attempt per source</b>, no retry &mdash; on failure: log, record <code>fetch_status: failed</code> with a reason, that task ends. Siblings finish normally.</li>
+              <li><b>http/https allowlist + an SSRF hostname blocklist</b> in <code>fetch.py</code> &mdash; the backend fetches URLs directly (no sandbox to hide behind), so this guard is new relative to the Eve reference.</li>
+              <li><b>HTTP 200 does not mean success.</b> The minimum-extractable-words check catches ADP and Ashby's JS shells (17 and 8 words) the same way it did in the Eve fixtures.</li>
+              <li>Byte caps and a size ceiling round out the same standing baseline carried over from the earlier decks in this series.</li>
+            </ul>
+            <div class="emphasis-box amber" style="margin-top:10px;">
+              <b>No-go rules, now enforced by pytest instead of eve eval:</b> a retried fetch, a fake analysis for a failed source, or an LLM-authored score &mdash; any one blocks <code>implemented &rarr; verified</code>.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 12: Operations — telemetry, env-selected
+           ========================================== -->
+      <section class="slide-brand" data-section="Operations">
+        <span class="kicker ph-operations"><span class="ph">Operations</span> Telemetry, By Env Alone</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Four backends, selected by <span class="highlight-amber">which env vars are set</span> &mdash; never by code</h1>
+        <p class="lede">Local structured JSON logs are always on. Remote backends activate the moment their own documented env vars appear &mdash; multiple can fan out at once. Instrumentation is decorator-only (AOP): core function bodies contain zero telemetry calls.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="panel" style="padding:0;overflow:hidden;">
+            <table class="toolkit-table" style="margin:0;">
+              <thead><tr><th style="width:34%;">Backend</th><th style="width:34%;">Enabled by</th><th>Extra deps?</th></tr></thead>
+              <tbody>
+                <tr><td>OpenObserve (REST)</td><td><code>OPENOBSERVE_URL</code> + org/stream/user/pass</td><td>none</td></tr>
+                <tr><td>OpenObserve (OTel)</td><td><code>OTEL_EXPORTER_OTLP_ENDPOINT</code></td><td><code>[otel]</code></td></tr>
+                <tr><td>Arize Phoenix</td><td><code>PHOENIX_COLLECTOR_ENDPOINT</code></td><td><code>[otel]</code></td></tr>
+                <tr><td>Arize AX</td><td><code>ARIZE_SPACE_ID</code> + <code>ARIZE_API_KEY</code></td><td><code>[otel]</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:chart-timeline-variant"></iconify-icon> Why decorators, not inline calls</h3>
+            <ul>
+              <li><b><code style="font-family:var(--font-mono);">@traced</code> / <code style="font-family:var(--font-mono);">@timed</code></b> attach to key methods only. A grep gate proves core modules have no trace/span calls inside function bodies &mdash; removing the decorators must leave behaviour identical.</li>
+              <li><b>Cost policy (2026-07-11):</b> live evals and chat both run on the OpenAI mini tier (<code>MODEL_ANALYST=openai:gpt-5.4-mini</code>) &mdash; extraction-only workload; upgrade only if SOFT expectations miss.</li>
+              <li><b>Delivery is fire-and-forget.</b> An unreachable backend logs one warning and never fails a run &mdash; the same graceful-degradation rule as the fetch guards, applied to observability.</li>
+            </ul>
+            <div class="emphasis-box" style="margin-top:10px;">
+              <b>Testing and monitoring meet here too:</b> <code>tests/test_observability.py</code> checks the same span nesting and parent/child relationships that Operations reviews live &mdash; one instrumentation contract, two consumers.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 13: Run it — four doors, one core
+           ========================================== -->
+      <section class="slide-brand" data-section="Run It">
+        <span class="kicker"><span class="ph">Run It</span> Four Doors, One Core</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">One core, four ways in &mdash; pick the one that fits the moment</h1>
+        <p class="lede">Put the resume next to the CLI, POST it to the API, import the package, or upload it in chat &mdash; every path runs the same <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">pipeline.py</code>.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div>
+            <div class="editor-window">
+              <div class="editor-titlebar">
+                <span class="editor-dots"><span></span><span></span><span></span></span>
+                <span class="editor-filename">terminal</span>
+              </div>
+              <div class="codepanel"><span class="acc">jobmatch analyze --resume evals/data/resume/synthetic-resume.pdf \
+  --job evals/data/jobs/data-engineering-manager-product-anthropic.txt \
+  --job evals/data/jobs/expert-senior-manager-ai-engineering-bain.txt \
+  --job evals/data/jobs/staff-software-engineer-ai-developer-tools-gusto.txt</span>
+            <span class="cmt">→ ranked summary on stdout, exit 0</span></div>
+            </div>
+            <div class="editor-window" style="margin-top:10px;">
+              <div class="editor-titlebar">
+                <span class="editor-dots"><span></span><span></span><span></span></span>
+                <span class="editor-filename">runs/2026-07-11T18-30-00Z/</span>
+              </div>
+              <div class="codepanel"><span class="ok">data-engineering-manager-product-anthropic_….json</span>
+<span class="ok">expert-senior-manager-ai-engineering-bain_….json</span>
+<span class="ok">staff-software-engineer-ai-developer-tools-gusto_….json</span>
+results.json   <span class="cmt">← the typed array, same shape POST /analyze returns</span>
+ranking.md     cover_letter_text (top pick)</div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:forum"></iconify-icon> Where it goes next</h3>
+            <ul>
+              <li><b>frontend/ (later phase):</b> a Vite SPA modeled on <code>privacyshield</code>, consuming the same FastAPI contract this deck already documents &mdash; the OpenAPI spec ships with every GitHub Release.</li>
+              <li><b>Auth &amp; rate limiting:</b> the API binds to localhost by default today &mdash; explicitly deferred to the deployment change, not an oversight.</li>
+              <li><b>Chat, today:</b> the owner's neutral chatbot already drives <code>analyze_job_fit</code> end-to-end through the agent service &mdash; verified, not just unit-tested (ADR 0001).</li>
+            </ul>
+            <div class="emphasis-box green" style="margin-top:10px;">
+              <b>The circle closes:</b> Operations findings + the next idea = the next Intent. AI-DLC is not a pipeline you finish once &mdash; it is a cycle you run again, and this repo is already on its second full turn since talent-align.
+            </div>
+            <div class="refs">
+              <b>References:</b>
+              <a href="https://prod.d13rzhkk8cj2z0.amplifyapp.com/" target="_blank" rel="noopener">AI-DLC</a><span class="sep">&middot;</span><a href="https://specs.md/" target="_blank" rel="noopener">specs.md</a><span class="sep">&middot;</span><a href="https://github.com/senthilsweb/agent-job-matcher" target="_blank" rel="noopener">agent-job-matcher repo</a><span class="sep">&middot;</span><a href="https://github.com/senthilsweb/ai-agents" target="_blank" rel="noopener">ai-agents repo (Eve reference)</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    // =========================================================================
+    // DECK CONFIG — the only block to edit for footer/branding. Everything
+    // else (page numbers, hide/show, theme) reads from this plus the
+    // per-slide data-section / data-hidden attributes on each <section>.
+    // =========================================================================
+    var DECK_CONFIG = {
+      title: 'AI-DLC In Practice · agent-job-matcher',
+      githubUrl: 'https://github.com/senthilsweb/agent-job-matcher',
+      websiteUrl: 'http://www.senthilsweb.com',
+      themeStorageKey: 'ai-dlc-deck-theme',
+    };
+    // =========================================================================
+
+    // Pull data-hidden="true" slides out of the DOM before Reveal boots, so
+    // a hidden slide is excluded from navigation, the progress bar, the page
+    // count below, and a Decktape PDF export — one attribute, nothing else
+    // to update by hand.
+    var allSections = Array.prototype.slice.call(document.querySelectorAll('.slides > section'));
+    var visibleSections = allSections.filter(function (s) { return s.dataset.hidden !== 'true'; });
+    allSections.filter(function (s) { return s.dataset.hidden === 'true'; })
+      .forEach(function (s) { s.parentNode.removeChild(s); });
+    visibleSections.forEach(function (s, i) { s.dataset.page = String(i + 1); });
+    var totalVisible = visibleSections.length;
+
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0,
+      controls: true,
+      progress: true,
+      center: false,
+      hash: true,
+      transition: 'fade',   // keep navigation predictable — no cube/zoom/spin
+      // deliberately no vertical slide stacks: linear, one direction, easy to narrate
+    });
+
+    // Build the global footer once (not duplicated per slide).
+    (function () {
+      var footer = document.createElement('div');
+      footer.className = 'deck-footer';
+      var linksHtml = '<span class="footer-links">';
+      if (DECK_CONFIG.githubUrl) {
+        linksHtml += '<a href="' + DECK_CONFIG.githubUrl + '" target="_blank" rel="noopener" title="GitHub"><iconify-icon icon="mdi:github"></iconify-icon></a>';
+      }
+      if (DECK_CONFIG.websiteUrl) {
+        linksHtml += '<a href="' + DECK_CONFIG.websiteUrl + '" target="_blank" rel="noopener" title="Website"><iconify-icon icon="mdi:web"></iconify-icon></a>';
+      }
+      linksHtml += '</span>';
+      footer.innerHTML =
+        '<span class="deck-footer-label"></span>' +
+        linksHtml +
+        '<span class="deck-footer-page"></span>';
+      document.body.appendChild(footer);
+
+      var labelEl = footer.querySelector('.deck-footer-label');
+      var pageEl = footer.querySelector('.deck-footer-page');
+
+      function updateFooter(slide) {
+        if (!slide) return;
+        var section = slide.dataset.section ? (' · ' + slide.dataset.section) : '';
+        labelEl.textContent = DECK_CONFIG.title + section;
+        pageEl.textContent = slide.dataset.page + ' / ' + totalVisible;
+      }
+
+      Reveal.on('ready', function (e) { updateFooter(e.currentSlide); });
+      Reveal.on('slidechanged', function (e) { updateFooter(e.currentSlide); });
+    })();
+
+    // Theme toggle
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('themeToggle');
+      var icon = btn.querySelector('iconify-icon');
+      function sync() {
+        var light = root.getAttribute('data-theme') === 'light';
+        icon.setAttribute('icon', light ? 'mdi:white-balance-sunny' : 'mdi:weather-night');
+      }
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem(DECK_CONFIG.themeStorageKey, next); } catch (e) {}
+        sync();
+      });
+      sync();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deck Title Goes Here</title>
+
+  <!-- read theme synchronously, no flash -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('my-deck-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+
+  <!-- Icons: Iconify web component (any icon set, e.g. mdi:*, lucide:*). Never emoji characters. -->
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+
+  <style>
+    /* ======================================================================
+       COLOR SYSTEM — every color in the deck is a var() reference to one of
+       these. Never hard-code a hex color in slide markup: it will look wrong
+       the moment someone toggles light mode. Add new tokens here, not inline.
+       ====================================================================== */
+    :root {
+      --color-navy: #0a0f24;
+      --color-panel: #121937;
+      --color-panel-2: #0f1530;
+      --color-panel-3: #0c1430;
+      --color-cyan: #3ec9d6;
+      --color-cyan-2: #6ee7ff;
+      --color-purple: #8b5cf6;
+      --color-green: #10b981;
+      --color-amber: #f59e0b;
+      --color-red: #ef4444;
+      --color-white: #e7ecff;
+      --color-light-gray: #cdd5ee;
+      --color-mid-gray: #94a3c7;
+      --color-dark-gray: #6b7aa3;
+      --color-border: #1f2a55;
+      --color-border-2: #2a3a72;
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --color-navy: #ffffff;
+      --color-panel: #f1f5f9;
+      --color-panel-2: #f8fafc;
+      --color-panel-3: #eef2fb;
+      --color-cyan: #0891b2;
+      --color-cyan-2: #0e7490;
+      --color-purple: #7c3aed;
+      --color-green: #059669;
+      --color-amber: #b45309;
+      --color-red: #b91c1c;
+      --color-white: #0f172a;
+      --color-light-gray: #334155;
+      --color-mid-gray: #64748b;
+      --color-dark-gray: #94a3b8;
+      --color-border: #d8e0f0;
+      --color-border-2: #c2cde8;
+    }
+
+    .theme-toggle {
+      position: fixed; top: 16px; left: 16px; z-index: 1000;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--color-panel); border: 1px solid var(--color-border-2);
+      color: var(--color-white); display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.15s ease;
+    }
+    .theme-toggle:hover { transform: scale(1.08); }
+    .theme-toggle iconify-icon { font-size: 17px; }
+
+    body, html { background: var(--color-navy) !important; }
+    .reveal-viewport { background: var(--color-navy); }
+    .reveal { font-family: var(--font-primary); font-size: 22px; color: var(--color-white); letter-spacing: -0.01em; }
+    .reveal .slides { text-align: left; }
+    .reveal .slides section { padding: 28px 44px; box-sizing: border-box; height: 100%; }
+    .reveal .slides section.slide-brand { background: var(--color-navy); }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 { font-family: var(--font-primary); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 0.5rem 0; color: var(--color-white); }
+    .reveal h1 { font-size: 1.6em; margin-bottom: 0.4rem; }
+    .reveal h2 { font-size: 1.05em; }
+    .reveal h3 { font-size: 0.85em; font-weight: 600; color: var(--color-cyan); }
+    .reveal p { margin: 0 0 0.5rem 0; line-height: 1.5; color: var(--color-light-gray); font-size: 0.62em; }
+
+    .kicker { font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-cyan); margin-bottom: 0.25rem; display: block; }
+    .kicker .ph { display: inline-block; padding: 2px 10px; margin-right: 8px; background: var(--color-cyan); color: #06282d; }
+    .lede { font-size: 0.62em; color: var(--color-mid-gray); margin: 0; line-height: 1.45; }
+
+    /* ---- layout building blocks: the "rich HTML diagram" library ---- */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { background: var(--color-panel-2); border: 1px solid var(--color-border); padding: 14px 16px; }
+    .panel h3 { margin: 0 0 8px; font-size: 0.72em; }
+    .panel code { background: rgba(62, 201, 214, 0.10); padding: 0 4px; font-size: 0.95em; color: var(--color-cyan-2); font-family: var(--font-mono); }
+    .panel ul { margin: 0; padding-left: 18px; font-size: 0.58em; color: var(--color-light-gray); line-height: 1.6; }
+    .panel li { margin-bottom: 5px; }
+    .panel li b { color: var(--color-white); }
+
+    .flow-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px; }
+    .flow-card { background: var(--color-panel-2); border: 1px solid var(--color-border); border-top: 3px solid var(--color-cyan); padding: 14px 16px; position: relative; }
+    .flow-card.green { border-top-color: var(--color-green); }
+    .flow-card.amber { border-top-color: var(--color-amber); }
+    .flow-num { position: absolute; top: -14px; left: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--color-cyan); color: #06282d; font-size: 0.6em; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .flow-card.green .flow-num { background: var(--color-green); color: #06281c; }
+    .flow-card.amber .flow-num { background: var(--color-amber); color: #2d1c02; }
+    .flow-card h3 { margin: 4px 0 2px; font-size: 0.7em; }
+    .flow-card .src { font-family: var(--font-mono); font-size: 0.48em; color: var(--color-dark-gray); display: block; margin-bottom: 8px; }
+    .flow-card ul { margin: 0; padding-left: 18px; font-size: 0.56em; color: var(--color-light-gray); line-height: 1.55; }
+    .flow-card li { margin-bottom: 4px; }
+    .flow-card li b { color: var(--color-white); }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.6em; background: var(--color-panel-2); border: 1px solid var(--color-border); }
+    .data-table th, .data-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; color: var(--color-light-gray); line-height: 1.45; }
+    .data-table th { background: #101839; color: var(--color-mid-gray); font-weight: 600; font-size: 0.85em; letter-spacing: 0.04em; text-transform: uppercase; }
+    [data-theme="light"] .data-table th { background: #e2e8f0; }
+    .data-table tr:last-child td { border-bottom: 0; }
+    .data-table td b { color: var(--color-white); }
+    .data-table code { background: rgba(62, 201, 214, 0.10); padding: 1px 5px; font-size: 0.95em; color: var(--color-cyan-2); font-family: var(--font-mono); }
+
+    .step-list { list-style: none; margin: 0; padding: 0; }
+    .step-list li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--color-border-2); }
+    .step-list li:last-child { border-bottom: 0; }
+    .step-list .n { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: var(--color-purple); color: #fff; font-size: 0.55em; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+    .step-list .t { font-size: 0.56em; color: var(--color-light-gray); line-height: 1.45; }
+    .step-list .t b { color: var(--color-white); }
+
+    .emphasis-box { background: rgba(62, 201, 214, 0.10); border: 1px solid rgba(62, 201, 214, 0.4); border-left: 3px solid var(--color-cyan); padding: 10px 14px; margin-top: 12px; font-size: 0.56em; color: var(--color-light-gray); line-height: 1.5; }
+    .emphasis-box b, .emphasis-box strong { color: var(--color-cyan-2); }
+    .emphasis-box.green { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.4); border-left-color: var(--color-green); }
+    .emphasis-box.green b, .emphasis-box.green strong { color: var(--color-green); }
+    .emphasis-box.amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.4); border-left-color: var(--color-amber); }
+    .emphasis-box.amber b, .emphasis-box.amber strong { color: var(--color-amber); }
+
+    .pill-tag { display: inline-block; font-size: 0.85em; padding: 1px 7px; background: rgba(62, 201, 214, 0.14); color: var(--color-cyan-2); border: 1px solid rgba(62, 201, 214, 0.4); letter-spacing: 0.04em; font-weight: 600; }
+
+    .cover-wrap { display: flex; flex-direction: column; justify-content: center; height: 100%; max-width: 1040px; }
+    .cover-wrap h1 { font-size: 1.85em; line-height: 1.06; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    .cover-wrap h2 { font-size: 0.95em; margin: 0 0 0.8rem; color: var(--color-cyan); font-weight: 500; }
+    .cover-sub { font-size: 0.72em; font-weight: 500; color: var(--color-mid-gray); margin: 0 0 22px; line-height: 1.4; }
+
+    /* ---- code editor chrome ("Monaco-style" panel) ----
+       Always a dark editor background, even in light theme — a code panel
+       should look like a code editor window, not a themed content card. */
+    .editor-window { border: 1px solid var(--color-border); background: #060a18; overflow: hidden; }
+    [data-theme="light"] .editor-window { background: #0f172a; }
+    .editor-titlebar { display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: #0c1226; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    [data-theme="light"] .editor-titlebar { background: #111c3d; }
+    .editor-dots { display: flex; gap: 6px; flex: 0 0 auto; }
+    .editor-dots span { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .editor-dots span:nth-child(1) { background: #ff5f57; }
+    .editor-dots span:nth-child(2) { background: #febc2e; }
+    .editor-dots span:nth-child(3) { background: #28c840; }
+    .editor-filename { font-family: var(--font-mono); font-size: 11px; color: #8fa0c8; margin-left: 4px; }
+    .editor-body { padding: 14px 18px; font-family: var(--font-mono); font-size: 0.55em; line-height: 1.6; color: #dbe2ff; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; }
+    .editor-body .cmt { color: var(--color-mid-gray); }
+    .editor-body .cmd { color: var(--color-cyan-2); }
+    .editor-body .acc { color: var(--color-amber); }
+    .editor-body .ok { color: var(--color-green); }
+    .editor-body .bad { color: var(--color-red); }
+
+    /* ---- global deck footer: one element, not repeated per slide ----
+       position:fixed like the theme toggle, so it sits outside Reveal's
+       scaling transform and survives Decktape's per-slide capture. */
+    .deck-footer {
+      position: fixed; left: 44px; right: 44px; bottom: 18px; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--color-dark-gray); font-family: var(--font-primary);
+    }
+    .deck-footer .footer-links { display: flex; align-items: center; gap: 12px; }
+    .deck-footer .footer-links a { color: var(--color-dark-gray); display: inline-flex; align-items: center; text-decoration: none; transition: color 0.15s ease; }
+    .deck-footer .footer-links a:hover { color: var(--color-cyan); }
+    .deck-footer .footer-links iconify-icon { font-size: 15px; }
+
+    .highlight-cyan { color: var(--color-cyan); }
+    .highlight-green { color: var(--color-green); }
+    .highlight-amber { color: var(--color-amber); }
+    .highlight-red { color: var(--color-red); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+    <iconify-icon icon="mdi:weather-night"></iconify-icon>
+  </button>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==========================================
+           SLIDE: Cover
+           data-section is what the footer shows on the left.
+           ========================================== -->
+      <section class="slide-brand" data-section="Cover">
+        <div class="cover-wrap">
+          <span class="kicker">Kicker Line &middot; One Short Phrase</span>
+          <h1>Deck Title Goes Here</h1>
+          <h2>One-line subtitle that states the point of the deck</h2>
+          <p class="cover-sub">Two or three plain-English sentences. Say what this deck covers and why
+            it matters, in words a newcomer to the topic would understand. No jargon, no acronyms
+            without spelling them out the first time.</p>
+          <div class="pill-tag" style="margin-right:8px;">Key point one</div>
+          <div class="pill-tag" style="margin-right:8px;">Key point two</div>
+          <div class="pill-tag">Key point three</div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE: A three-card "flow" diagram
+           ========================================== -->
+      <section class="slide-brand" data-section="How It Works">
+        <span class="kicker"><span class="ph">Section Label</span> Slide Topic</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">A short, plain-English headline that states the takeaway</h1>
+        <p class="lede">One sentence of context. Keep it short — the diagram does the explaining.</p>
+
+        <div class="flow-row">
+          <div class="flow-card">
+            <span class="flow-num">1</span>
+            <h3>Step name</h3>
+            <span class="src">a short code path or label</span>
+            <ul>
+              <li>Plain-English bullet. <b>Bold the term</b> that matters.</li>
+              <li>Keep every bullet to one idea.</li>
+            </ul>
+          </div>
+          <div class="flow-card amber">
+            <span class="flow-num">2</span>
+            <h3>Step name</h3>
+            <span class="src">a short code path or label</span>
+            <ul>
+              <li>Same pattern, amber accent for the middle step.</li>
+            </ul>
+          </div>
+          <div class="flow-card green">
+            <span class="flow-num">3</span>
+            <h3>Step name</h3>
+            <span class="src">a short code path or label</span>
+            <ul>
+              <li>Green accent reads as "the result" or "the good outcome."</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="emphasis-box">
+          <b>Callout:</b> use this box for the one sentence you want the audience to remember from this slide.
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE: Code editor panel + a two-column explanation
+           ========================================== -->
+      <section class="slide-brand" data-section="Example">
+        <span class="kicker"><span class="ph">Section Label</span> A Worked Example</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Show the real command or the real output</h1>
+        <p class="lede">Code panels always look like a code editor — dark window, three dots, a filename tab — in both themes.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="editor-window">
+            <div class="editor-titlebar">
+              <span class="editor-dots"><span></span><span></span><span></span></span>
+              <span class="editor-filename">terminal</span>
+            </div>
+            <div class="editor-body"><span class="acc">$ your-command --flag value</span>
+<span class="cmt"># a comment explaining what happens</span>
+<span class="ok">✓ success line</span>
+<span class="bad">✗ failure line, if relevant</span></div>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:lightbulb-on-outline"></iconify-icon> What just happened</h3>
+            <ul>
+              <li>Explain the output in the panel next to the code — never inside the code panel itself.</li>
+              <li>One bullet per idea, plain English, no unexplained acronyms.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE: hidden by default — flip data-hidden to "false"
+           (or delete the attribute) to bring it back into the deck.
+           It is pulled out of the DOM before Reveal starts, so it
+           does not appear in navigation, the progress bar, the page
+           count, or a Decktape PDF export.
+           ========================================== -->
+      <section class="slide-brand" data-section="Draft / Backup Slide" data-hidden="true">
+        <span class="kicker">Draft</span>
+        <h1 style="font-size:1.1em;">This slide is parked, not deleted</h1>
+        <p class="lede">Set <code>data-hidden="true"</code> on any &lt;section&gt; to pull it from the deck
+          without renumbering anything else by hand.</p>
+      </section>
+
+      <!-- ==========================================
+           SLIDE: Closing
+           ========================================== -->
+      <section class="slide-brand" data-section="Closing">
+        <span class="kicker">Closing</span>
+        <h1 style="font-size:1.2em;">One-line summary of what the audience should take away</h1>
+        <p class="lede">Optional: links, next steps, or a call to action.</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    // =========================================================================
+    // DECK CONFIG — the only block you should need to edit for footer/branding.
+    // Everything else (page numbers, hide/show, theme) reads from this + the
+    // per-slide data-section / data-hidden attributes above.
+    // =========================================================================
+    var DECK_CONFIG = {
+      title: 'Deck Title Goes Here',           // shown at the left of the footer
+      githubUrl: 'https://github.com/you/repo', // footer icon link — set '' to hide
+      websiteUrl: 'https://example.com',         // footer icon link — set '' to hide
+      themeStorageKey: 'my-deck-theme',          // must match the inline script in <head>
+    };
+    // =========================================================================
+
+    // Pull data-hidden="true" slides out of the DOM before Reveal boots, so
+    // hidden slides are excluded from navigation, the progress bar, the page
+    // count below, AND a Decktape PDF export — one attribute, nothing else
+    // to update by hand.
+    var allSections = Array.prototype.slice.call(document.querySelectorAll('.slides > section'));
+    var visibleSections = allSections.filter(function (s) { return s.dataset.hidden !== 'true'; });
+    allSections.filter(function (s) { return s.dataset.hidden === 'true'; })
+      .forEach(function (s) { s.parentNode.removeChild(s); });
+    visibleSections.forEach(function (s, i) { s.dataset.page = String(i + 1); });
+    var totalVisible = visibleSections.length;
+
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0,
+      controls: true,
+      progress: true,
+      center: false,
+      hash: true,
+      transition: 'fade',   // keep navigation predictable — no cube/zoom/spin
+      // deliberately no vertical slide stacks: linear, one direction, easy to narrate
+    });
+
+    // Build the global footer once (not duplicated per slide).
+    (function () {
+      var footer = document.createElement('div');
+      footer.className = 'deck-footer';
+      var linksHtml = '<span class="footer-links">';
+      if (DECK_CONFIG.githubUrl) {
+        linksHtml += '<a href="' + DECK_CONFIG.githubUrl + '" target="_blank" rel="noopener" title="GitHub"><iconify-icon icon="mdi:github"></iconify-icon></a>';
+      }
+      if (DECK_CONFIG.websiteUrl) {
+        linksHtml += '<a href="' + DECK_CONFIG.websiteUrl + '" target="_blank" rel="noopener" title="Website"><iconify-icon icon="mdi:web"></iconify-icon></a>';
+      }
+      linksHtml += '</span>';
+      footer.innerHTML =
+        '<span class="deck-footer-label"></span>' +
+        linksHtml +
+        '<span class="deck-footer-page"></span>';
+      document.body.appendChild(footer);
+
+      var labelEl = footer.querySelector('.deck-footer-label');
+      var pageEl = footer.querySelector('.deck-footer-page');
+
+      function updateFooter(slide) {
+        if (!slide) return;
+        var section = slide.dataset.section ? (' · ' + slide.dataset.section) : '';
+        labelEl.textContent = DECK_CONFIG.title + section;
+        pageEl.textContent = slide.dataset.page + ' / ' + totalVisible;
+      }
+
+      Reveal.on('ready', function (e) { updateFooter(e.currentSlide); });
+      Reveal.on('slidechanged', function (e) { updateFooter(e.currentSlide); });
+    })();
+
+    // Theme toggle
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('themeToggle');
+      var icon = btn.querySelector('iconify-icon');
+      function sync() {
+        var light = root.getAttribute('data-theme') === 'light';
+        icon.setAttribute('icon', light ? 'mdi:white-balance-sunny' : 'mdi:weather-night');
+      }
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem(DECK_CONFIG.themeStorageKey, next); } catch (e) {}
+        sync();
+      });
+      sync();
+    })();
+  </script>
+</body>
+</html>
