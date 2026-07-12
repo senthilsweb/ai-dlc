@@ -34,29 +34,24 @@ Then navigate to `http://localhost:8000`.
 
 ## The lineage this deck teaches
 
-Three generations of the same idea, each one the "before" picture for the next gate:
-
-1. **`talent-align`** — a vibe-coded prototype (pydantic-ai + Streamlit), built in an
-   afternoon of chat, no process. Proved the idea works.
-2. **`agents/job-matcher`** (Eve/TypeScript, in the
-   [`ai-agents`](https://github.com/senthilsweb/ai-agents) monorepo) — the first
-   AI-DLC governed rebuild: deterministic scoring in code, evidence-grounded
-   extraction, evals-first, human-gated `.openspec.yaml` lifecycle. Proved the
-   *design*.
-3. **[`agent-job-matcher`](https://github.com/senthilsweb/agent-job-matcher)**
-   (this deck's subject) — a standalone Python product rebuilt on that design,
-   not on the Eve runtime: four access surfaces (CLI, REST, embeddable Python
-   core, MCP + chat), exactly two LLM operations system-wide, eleven
-   Construction bolts, and an eval suite restated as `pytest`.
+This is the second time this idea has been built properly. The first version
+was a quick prototype — useful for proving the idea worked, but with
+shortcuts (the AI graded its own answer, no automated tests, personal data
+hard-coded) that don't belong in a real product.
+[`agent-job-matcher`](https://github.com/senthilsweb/agent-job-matcher) (this
+deck's subject) is a standalone Python product built the careful way from
+scratch: four ways in (a command line, a web API, a Python import, and a
+chat interface), a score computed by plain code rather than the AI, and 135
+automated checks. See that repo's `openspec/project.md` for the full history.
 
 ## Slide overview
 
-13 slides: cover · the story · three generations compared · ceremonies by
-role · the AI-DLC cycle · a shared AI-DLC glossary (generic terms, reused
-across this deck series) · the Inception gate's seven logged revisions ·
-what a Bolt is (11 of them here) · architecture (two LLM calls, async
-per-job fan-out) · evals as pytest (HARD/SOFT) · the security baseline ·
-telemetry across four env-selected backends · running it four ways.
+13 slides, all in plain English, no unexplained jargon: cover · what it does
+· where the idea came from · how the work is organized · the AI-DLC cycle ·
+a shared glossary (terms reused across this deck series) · the seven rounds
+of plan changes before any code · the 11 build steps with their real test
+counts, as a table · how it's put together · how it's tested · how it's kept
+safe · a real trace of a real run, viewed in Arize AX · running it four ways.
 
 ## Other files
 
@@ -66,11 +61,8 @@ telemetry across four env-selected backends · running it four ways.
   deck-building conventions (theme, icons, code panels, diagrams, the
   hide/page-number mechanism) and a starter `template.html`. Also
   installed at `~/.claude/skills/slide-deck/` for use in any repo.
-- `ceremonies-and-roles-eve-era.md` — the ceremony/role reference doc
-  written for the Eve-era `job-matcher` build. Ceremony and role
-  definitions still apply; runtime specifics (Eve sessions, subagents,
-  `.ts` paths) predate `agent-job-matcher` and are kept as historical
-  background, not as this repo's canonical narrative (that's `index.html`).
+- `assets/` — real screenshots used in the deck (the Arize AX trace on the
+  "watching it run" slide).
 
 ## Technology
 
