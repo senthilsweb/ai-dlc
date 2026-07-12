@@ -209,6 +209,12 @@
 
     .pill-tag { display: inline-block; font-size: 0.85em; padding: 1px 7px; background: rgba(62, 201, 214, 0.14); color: var(--color-cyan-2); border: 1px solid rgba(62, 201, 214, 0.4); letter-spacing: 0.04em; font-weight: 600; }
 
+    .role-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.95em; padding: 2px 8px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap; }
+    .role-badge iconify-icon { font-size: 1.1em; }
+    .role-badge.human { background: rgba(139,92,246,0.14); color: var(--color-purple); border: 1px solid rgba(139,92,246,0.4); }
+    .role-badge.ai { background: rgba(62,201,214,0.14); color: var(--color-cyan-2); border: 1px solid rgba(62,201,214,0.4); }
+    .role-badge.both { background: rgba(16,185,129,0.12); color: var(--color-green); border: 1px solid rgba(16,185,129,0.4); }
+
     .emphasis-box { background: rgba(62, 201, 214, 0.10); border: 1px solid rgba(62, 201, 214, 0.4); border-left: 3px solid var(--color-cyan); padding: 10px 14px; margin-top: 12px; font-size: 0.56em; color: var(--color-light-gray); line-height: 1.5; }
     .emphasis-box b, .emphasis-box strong { color: var(--color-cyan-2); }
     .emphasis-box.green { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.4); border-left-color: var(--color-green); }
@@ -241,7 +247,7 @@
       font-size: 13px; color: var(--color-dark-gray); font-family: var(--font-primary);
     }
     .deck-footer .footer-links { display: flex; align-items: center; gap: 12px; }
-    .deck-footer .footer-links a { color: var(--color-dark-gray); display: inline-flex; align-items: center; text-decoration: none; transition: color 0.15s ease; }
+    .deck-footer .footer-links a { color: var(--color-dark-gray); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: color 0.15s ease; }
     .deck-footer .footer-links a:hover { color: var(--color-cyan); }
     .deck-footer .footer-links iconify-icon { font-size: 15px; }
 
@@ -417,7 +423,7 @@
             <h3><span class="ph-num">1</span> Inception</h3>
             <p class="ph-sub">Understand before building</p>
             <div class="aidlc-step"><b>Intent Capture</b><span>The owner states the goal, in plain words</span></div>
-            <div class="aidlc-step"><b>Mob Elaboration</b><span>The plan gets written &mdash; why, how, and what "done" means &mdash; through seven logged rounds of changes</span></div>
+            <div class="aidlc-step"><b>Mob Elaboration</b><span>The plan gets written &mdash; why, how, and what "done" means &mdash; through six logged rounds of revisions</span></div>
             <div class="aidlc-step"><b>Inception Gate</b><span>Nothing gets built until a person signs off on the plan</span></div>
           </div>
           <div class="aidlc-phase construction">
@@ -430,8 +436,7 @@
           <div class="aidlc-phase operations">
             <h3><span class="ph-num">3</span> Operations</h3>
             <p class="ph-sub">Watch, then loop back</p>
-            <div class="aidlc-step"><b>Operations Review</b><span>Look at real traces, timing, and cost once it's handling real requests</span></div>
-            <div class="aidlc-step"><b>Next Intent</b><span>Whatever gets learned becomes the next Intent, and the cycle starts again</span></div>
+            <div class="aidlc-step"><b>Operations Review</b><span>Look at real traces, timing, and cost once it's handling real requests &mdash; feeds the <b>Next Intent</b>, and the circle starts again</span></div>
           </div>
         </div>
 
@@ -471,7 +476,7 @@
           </div>
           <div class="cycle-node" style="left:695px;top:125px;">
             <b><span class="cn">2</span> Mob Elaboration</b>
-            <span class="d">The plan gets written and reviewed &mdash; seven rounds of changes, this time</span>
+            <span class="d">The plan gets written and reviewed &mdash; six rounds of revisions before this project's plan was approved</span>
           </div>
           <div class="cycle-node purple" style="left:752px;top:281px;">
             <b><span class="cn">3</span> Inception Gate</b>
@@ -497,7 +502,37 @@
       </section>
 
       <!-- ==========================================
-           SLIDE 6: Shared glossary
+           SLIDE 6: Roles in the Mob
+           ========================================== -->
+      <section class="slide-brand" data-section="The Mob">
+        <span class="kicker"><span class="ph">The Method</span> Who's In The Mob</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">A "mob" is the group doing the ceremonies &mdash; most of them are AI</h1>
+        <p class="lede">Every ceremony has a named role behind it. Two are always a person; almost everything else is an AI agent doing that role in minutes, not days.</p>
+
+        <div class="panel" style="padding:0;overflow:hidden;margin-top:8px;">
+          <table class="toolkit-table" style="margin:0;">
+            <thead><tr><th style="width:18%;">Role</th><th style="width:16%;">Played by</th><th>What they do here</th></tr></thead>
+            <tbody>
+              <tr><td><b>Product Owner</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Human</span></td><td>States the Intent, approves every gate, has the final word at UAT. Always a person &mdash; no exceptions.</td></tr>
+              <tr><td><b>Architect</b></td><td><span class="role-badge both"><iconify-icon icon="mdi:account-supervisor"></iconify-icon>AI drafts, human signs off</span></td><td>Shapes <code>design.md</code>; the owner reviews and approves it before Construction starts.</td></tr>
+              <tr><td><b>Business Analyst</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Drafts the plan during Mob Elaboration &mdash; <code>proposal.md</code>, the six open questions, the revision log.</td></tr>
+              <tr><td><b>AI Engineer</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Writes the code, one Bolt at a time, during Mob Construction.</td></tr>
+              <tr><td><b>QA / Evaluator</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Writes and runs the evals, graded against the rubric &mdash; before or alongside the code, never after.</td></tr>
+              <tr><td><b>Security / InfoSec</b></td><td><span class="role-badge both"><iconify-icon icon="mdi:account-supervisor"></iconify-icon>AI attacks it, human signs off</span></td><td>Deliberately tries to trick or break it during the Security Baseline ceremony.</td></tr>
+              <tr><td><b>DevOps</b></td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>AI Agent</span></td><td>Wires up monitoring, releases, and deployment configuration.</td></tr>
+              <tr><td><b>Visual Designer</b></td><td><span class="role-badge ai" style="opacity:0.6;"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Not used yet</span></td><td>This project has no on-screen interface yet, so this role hasn't been needed &mdash; it would join once one gets built.</td></tr>
+              <tr><td><b>UAT</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Human (the Product Owner)</span></td><td>The final real-world check &mdash; a real run in Claude Desktop or the actual chat window, not a stand-in.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="emphasis-box green" style="margin-top:10px;">
+          <b>Almost every role here is an AI agent</b> &mdash; only the Product Owner is always human, plus a human sign-off on the Architect's and Security reviewer's work. Each AI role finishes its ceremony in minutes, not days. That speed is exactly why the work can be split into small, reviewable Bolts instead of multi-week sprints.
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 7: Shared glossary
            ========================================== -->
       <section class="slide-brand" data-section="Glossary">
         <span class="kicker"><span class="ph">Reference</span> The AI-DLC Vocabulary</span>
@@ -512,11 +547,11 @@
             <tbody>
               <tr><td style="color:var(--color-cyan);font-weight:600;">Intent</td><td>The high-level goal, stated in plain language &mdash; the single seed everything grows from.</td><td>"Turn the quick prototype into a real, standalone product."</td></tr>
               <tr><td style="color:var(--color-cyan);font-weight:600;">Ceremony</td><td>A named step in the process, with its own people, inputs, and a written output.</td><td>Mob Elaboration is a ceremony; its output is the plan documents.</td></tr>
-              <tr><td style="color:var(--color-cyan);font-weight:600;">Mob Elaboration</td><td>The Inception ceremony where the plan gets drafted; the owner reviews it and asks for changes.</td><td>Seven logged rounds of changes before the plan was approved.</td></tr>
+              <tr><td style="color:var(--color-cyan);font-weight:600;">Mob Elaboration</td><td>The Inception ceremony where the plan gets drafted; the owner reviews it and asks for changes.</td><td>Six logged rounds of revisions before the plan was approved.</td></tr>
               <tr><td style="color:var(--color-purple);font-weight:600;">Unit of Work</td><td>One small, self-contained thing to build &mdash; not a whole feature. Replaces the Agile "story."</td><td>One line in <code>tasks.md</code> &mdash; e.g. "block risky web links."</td></tr>
               <tr><td style="color:var(--color-purple);font-weight:600;">Mob Construction</td><td>The Construction ceremony where code and evals get written, reviewed as they go.</td><td>The owner reviews each Bolt's work before the next one starts.</td></tr>
               <tr><td style="color:var(--color-amber);font-weight:600;">Bolt</td><td>A short burst of Construction &mdash; hours, not weeks. Replaces the Agile "sprint."</td><td>Bolt 3 &mdash; the one AI call plus the command-line tool, done in one sitting.</td></tr>
-              <tr><td style="color:var(--color-green);font-weight:600;">Rubric</td><td>The written pass/fail rules an eval is graded against, agreed before the code exists.</td><td><code>evals/rubrics.md</code> &mdash; the scoring formula and every HARD/SOFT rule.</td></tr>
+              <tr><td style="color:var(--color-green);font-weight:600;">Rubric</td><td>An answer key for the grader &mdash; the exact criteria and procedure for marking each eval right or wrong, written before the code exists. The grader (human or AI) follows it; they don't decide the standard themselves.</td><td><code>evals/rubrics.md</code> &mdash; the scoring formula and every HARD/SOFT rule.</td></tr>
               <tr><td style="color:var(--color-green);font-weight:600;">Operations</td><td>The finished thing runs for real; what happens feeds the next Intent.</td><td>Real traces reviewed &rarr; a rubric rule gets tightened &rarr; the next round begins.</td></tr>
             </tbody>
           </table>
@@ -529,12 +564,12 @@
       </section>
 
       <!-- ==========================================
-           SLIDE 7: Inception — seven rounds of changes
+           SLIDE 7: Inception — six rounds of revisions
            ========================================== -->
       <section class="slide-brand" data-section="Inception">
-        <span class="kicker ph-gate"><span class="ph">Inception</span> Mob Elaboration, Seven Rounds</span>
-        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Seven rounds of Mob Elaboration reshaped the plan <span class="highlight-cyan">before any code was written</span></h1>
-        <p class="lede"><b>Mob Elaboration</b> is the Inception ceremony that turns an Intent into a plan. This project's plan was revised seven times while it was still just a document &mdash; every change dated and explained, so the plan grew in the open, not by accident.</p>
+        <span class="kicker ph-gate"><span class="ph">Inception</span> Mob Elaboration, Six Revisions</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Six rounds of Mob Elaboration reshaped the plan <span class="highlight-cyan">before any code was written</span></h1>
+        <p class="lede"><b>Mob Elaboration</b> is the Inception ceremony that turns an Intent into a plan. This project's plan went through <b>six dated rounds of revisions</b> (numbered 2&ndash;7 below) while it was still just a document &mdash; every change explained, so the plan grew in the open, not by accident.</p>
 
         <div class="twocol" style="margin-top:12px;">
           <div class="panel">
@@ -562,7 +597,7 @@
               </tbody>
             </table>
             <div class="emphasis-box amber" style="margin:10px 12px 12px;">
-              <b>Why this saves money:</b> every one of these seven changes is a paragraph in a document. The same change made after the code was half-built would mean rewriting real, working software.
+              <b>Why this saves money:</b> every one of these six revisions is a paragraph in a document. The same change made after the code was half-built would mean rewriting real, working software.
             </div>
           </div>
         </div>
@@ -574,30 +609,68 @@
       <section class="slide-brand" data-section="Construction">
         <span class="kicker ph-construction"><span class="ph">Construction</span> Every Bolt, With Its Evals</span>
         <h1 style="font-size:1.1em;margin:0 0 0.1rem;">11 Bolts, each one finished and tested before the next begins</h1>
-        <p class="lede">A <b>Bolt</b> is a short burst of Mob Construction &mdash; a handful of Units of Work finished in one sitting, checked off in <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">tasks.md</code>. Here's the real list, with how many evals back each one.</p>
+        <p class="lede">A <b>Bolt</b> is a short burst of Mob Construction &mdash; a handful of <b>Units of Work</b> (checkboxes in <code style="font-family:var(--font-mono);color:var(--color-cyan-2);">tasks.md</code>) finished in one sitting. Here's the real list: every Bolt, how many Units of Work it took, and how many evals back it.</p>
 
         <div class="panel" style="padding:0;overflow:hidden;margin-top:10px;">
           <table class="toolkit-table" style="margin:0;">
-            <thead><tr><th style="width:8%;">Bolt</th><th style="width:52%;">What it built</th><th style="width:40%;">Evals</th></tr></thead>
+            <thead><tr><th style="width:8%;">Bolt</th><th style="width:46%;">What it built</th><th style="width:20%;">Units of Work</th><th style="width:26%;">Evals</th></tr></thead>
             <tbody>
-              <tr><td><b>0</b></td><td>Inception Gate &mdash; settled the six open questions, no code yet</td><td>&mdash;</td></tr>
-              <tr><td><b>1</b></td><td>The scoring math, and the shape of every piece of data</td><td>37 evals</td></tr>
-              <tr><td><b>2</b></td><td>Reading resumes and fetching job postings, safely</td><td>22 evals</td></tr>
-              <tr><td><b>3</b></td><td>The one AI call, plus the command-line tool</td><td>8 evals</td></tr>
-              <tr><td><b>4</b></td><td>The web version (a normal web address other programs can call)</td><td>12 evals</td></tr>
-              <tr><td><b>5</b></td><td>Sending data to monitoring tools</td><td>8 evals</td></tr>
-              <tr><td><b>6</b></td><td>Turning a resume into structured, standard data</td><td>10 evals</td></tr>
-              <tr><td><b>7</b></td><td>Letting Claude Desktop use this project as a tool</td><td>5 evals</td></tr>
-              <tr><td><b>8</b></td><td>The chat version, for an existing chat assistant</td><td>9 evals</td></tr>
-              <tr><td><b>9</b></td><td>Verification &mdash; testing against a real AI model, not a stand-in</td><td>11 evals</td></tr>
-              <tr><td><b>10</b></td><td>Writing the cover letter, from real resume details</td><td>13 evals</td></tr>
-              <tr class="total-row"><td colspan="2">11 Bolts, total</td><td>135 evals</td></tr>
+              <tr><td><b>0</b></td><td>Inception Gate &mdash; settled the six open questions, no code yet</td><td>8 tasks</td><td>&mdash;</td></tr>
+              <tr><td><b>1</b></td><td>The scoring math, and the shape of every piece of data</td><td>8 tasks</td><td>37 evals</td></tr>
+              <tr><td><b>2</b></td><td>Reading resumes and fetching job postings, safely</td><td>3 tasks</td><td>22 evals</td></tr>
+              <tr><td><b>3</b></td><td>The one AI call, plus the command-line tool</td><td>9 tasks</td><td>8 evals</td></tr>
+              <tr><td><b>4</b></td><td>The web version (a normal web address other programs can call)</td><td>4 tasks</td><td>12 evals</td></tr>
+              <tr><td><b>5</b></td><td>Sending data to monitoring tools</td><td>5 tasks</td><td>8 evals</td></tr>
+              <tr><td><b>6</b></td><td>Turning a resume into structured, standard data</td><td>4 tasks</td><td>10 evals</td></tr>
+              <tr><td><b>7</b></td><td>Letting Claude Desktop use this project as a tool</td><td>3 tasks</td><td>5 evals</td></tr>
+              <tr><td><b>8</b></td><td>The chat version, for an existing chat assistant</td><td>6 tasks</td><td>9 evals</td></tr>
+              <tr><td><b>9</b></td><td>Verification &mdash; testing against a real AI model, not a stand-in</td><td>5 tasks</td><td>11 evals</td></tr>
+              <tr><td><b>10</b></td><td>Writing the cover letter, from real resume details</td><td>7 tasks</td><td>13 evals</td></tr>
+              <tr class="total-row"><td colspan="2">11 Bolts, total</td><td>62 tasks</td><td>135 evals</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="emphasis-box green" style="margin-top:12px;">
-          <b>Almost every eval needs no AI model and no internet</b> &mdash; they run in a second, for free, forever. Only Bolt 9's 11 evals deliberately spend a little money to test against a real AI model before anything ships.
+          <b>Almost every eval needs no AI model and no internet</b> &mdash; they run in a second, for free, forever. Only Bolt 9's 11 evals deliberately spend a little money to test against a real AI model before anything ships. Want to see one Bolt's actual tasks and evals, side by side? Next slide.
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 8b: One Bolt, start to finish — Bolt 10
+           ========================================== -->
+      <section class="slide-brand" data-section="One Bolt, Up Close">
+        <span class="kicker ph-construction"><span class="ph">Construction</span> One Bolt, Start to Finish</span>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Bolt 10: writing the cover letter &mdash; every task, every eval, one real bug</h1>
+        <p class="lede">Zooming into one real Bolt: the 7 Units of Work it took, the 13 evals that backed it, and a genuine mistake caught along the way &mdash; not a cleaned-up retelling.</p>
+
+        <div class="twocol" style="margin-top:10px;">
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:format-list-checks"></iconify-icon> The 7 Units of Work</h3>
+            <ol class="step-list">
+              <li><span class="n">1</span><span class="t">Pull contact details from the resume with plain pattern-matching &mdash; no AI call, so a wrong guess is structurally impossible.</span></li>
+              <li><span class="n">2</span><span class="t">Write the default cover-letter template, shipped with the project so it works with zero setup.</span></li>
+              <li><span class="n">3</span><span class="t">Make the template system fall back to that default whenever no custom one is supplied.</span></li>
+              <li><span class="n">4</span><span class="t">Wire the candidate's name and contact details into the letter-writing step, computed once per run.</span></li>
+              <li><span class="n">5</span><span class="t">Write 13 new evals &mdash; including cases where a contact detail is missing on purpose.</span></li>
+              <li><span class="n">6</span><span class="t">Run it once against a real AI model, and read the actual output.</span></li>
+              <li><span class="n">7</span><span class="t">Re-run the entire eval suite clean, end to end &mdash; 109/109.</span></li>
+            </ol>
+          </div>
+          <div class="panel">
+            <h3><iconify-icon icon="mdi:bug-outline"></iconify-icon> 13 evals, and a real bug they caught</h3>
+            <ul>
+              <li><b>8 evals</b> on pulling contact details out correctly &mdash; including "this field is genuinely missing, don't invent it."</li>
+              <li><b>5 evals</b> on the rendered letter itself &mdash; the default template, an operator's custom template overriding it, and a check that every detail in the letter is a literal piece of the resume.</li>
+            </ul>
+            <div class="emphasis-box amber" style="margin-top:10px;">
+              <b>The bug:</b> an email like <code>sam.lee@example.com</code> was briefly misread as a website address too &mdash; the pattern excluded what comes <i>after</i> the @ sign, not the name <i>before</i> it. Caught immediately by testing against real examples, fixed by removing every email from the text before hunting for websites, and logged as a dated <b>Correction</b> &mdash; not silently rewritten.
+            </div>
+          </div>
+        </div>
+
+        <div class="emphasis-box green" style="margin-top:10px;">
+          <b>This is what "evals before or alongside the code" looks like in practice:</b> the missing-field tests, the default-template test, and the grounding test all existed before this Bolt was called finished &mdash; not added afterward to match whatever the code happened to do.
         </div>
       </section>
 
@@ -648,7 +721,7 @@
       <section class="slide-brand" data-section="Evals">
         <span class="kicker ph-construction"><span class="ph">Construction</span> Evals, Graded By Rubric</span>
         <h1 style="font-size:1.1em;margin:0 0 0.1rem;">135 evals, written from the rubric before the code existed</h1>
-        <p class="lede">An <b>eval</b> is a test written from the spec, before or alongside the code it checks. The <b>rubric</b> (<code style="font-family:var(--font-mono);color:var(--color-cyan-2);">evals/rubrics.md</code>) is the written pass/fail rule for each one &mdash; agreed on paper, not decided by eye afterward.</p>
+        <p class="lede">An <b>eval</b> is a test written from the spec, before or alongside the code it checks. The <b>rubric</b> (<code style="font-family:var(--font-mono);color:var(--color-cyan-2);">evals/rubrics.md</code>) is the answer key it's graded against &mdash; the exact criteria and procedure for marking it right or wrong, agreed on paper. The grader follows the rubric; it doesn't decide the standard on the spot.</p>
 
         <div class="twocol" style="margin-top:10px;">
           <div class="panel" style="padding:0;overflow:hidden;">
@@ -807,7 +880,7 @@ ranking + a ready-to-use cover letter for the top pick</div>
     var DECK_CONFIG = {
       title: 'AI-DLC In Practice · agent-job-matcher',
       githubUrl: 'https://github.com/senthilsweb/agent-job-matcher',
-      websiteUrl: 'http://www.senthilsweb.com',
+      githubLabel: 'github.com/senthilsweb/agent-job-matcher',
       themeStorageKey: 'ai-dlc-deck-theme',
     };
     // =========================================================================
@@ -841,10 +914,8 @@ ranking + a ready-to-use cover letter for the top pick</div>
       footer.className = 'deck-footer';
       var linksHtml = '<span class="footer-links">';
       if (DECK_CONFIG.githubUrl) {
-        linksHtml += '<a href="' + DECK_CONFIG.githubUrl + '" target="_blank" rel="noopener" title="GitHub"><iconify-icon icon="mdi:github"></iconify-icon></a>';
-      }
-      if (DECK_CONFIG.websiteUrl) {
-        linksHtml += '<a href="' + DECK_CONFIG.websiteUrl + '" target="_blank" rel="noopener" title="Website"><iconify-icon icon="mdi:web"></iconify-icon></a>';
+        linksHtml += '<a href="' + DECK_CONFIG.githubUrl + '" target="_blank" rel="noopener" title="GitHub">' +
+          '<iconify-icon icon="mdi:github"></iconify-icon>' + (DECK_CONFIG.githubLabel || DECK_CONFIG.githubUrl) + '</a>';
       }
       linksHtml += '</span>';
       footer.innerHTML =

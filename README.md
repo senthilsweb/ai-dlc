@@ -46,12 +46,15 @@ automated checks. See that repo's `openspec/project.md` for the full history.
 
 ## Slide overview
 
-13 slides, all in plain English, no unexplained jargon: cover · what it does
-· where the idea came from · how the work is organized · the AI-DLC cycle ·
-a shared glossary (terms reused across this deck series) · the seven rounds
-of plan changes before any code · the 11 build steps with their real test
-counts, as a table · how it's put together · how it's tested · how it's kept
-safe · a real trace of a real run, viewed in Arize AX · running it four ways.
+15 slides, in plain English but using AI-DLC's real vocabulary throughout —
+this deck's whole point is teaching that vocabulary, not hiding it: cover ·
+what it does · where the idea came from · the three phases and seven
+ceremonies · the AI-DLC cycle · who's in the mob (which roles are human vs.
+AI) · a shared glossary · the six rounds of plan revisions before any code ·
+all 11 Bolts with their real Units-of-Work and eval counts, as a table · one
+Bolt opened up completely (tasks, evals, and a real bug) · how it's put
+together · evals and the rubric that grades them · how it's kept safe · a
+real trace of a real run, viewed in Arize AX · running it four ways.
 
 ## Other files
 
@@ -63,6 +66,8 @@ safe · a real trace of a real run, viewed in Arize AX · running it four ways.
   installed at `~/.claude/skills/slide-deck/` for use in any repo.
 - `assets/` — real screenshots used in the deck (the Arize AX trace on the
   "watching it run" slide).
+- `archive/` — earlier drafts of `index.html`, kept for reference rather
+  than lost when the deck gets rewritten.
 
 ## Technology
 
