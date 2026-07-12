@@ -506,28 +506,31 @@
            ========================================== -->
       <section class="slide-brand" data-section="The Mob">
         <span class="kicker"><span class="ph">The Method</span> Who's In The Mob</span>
-        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Three people carry the weight. AI does the typing, fast.</h1>
-        <p class="lede">It is not just the Product Owner doing everything. Every ceremony has a human accountable for it and an AI agent doing the fast work under them &mdash; and that human is one of three people, wearing different hats.</p>
+        <h1 style="font-size:1.1em;margin:0 0 0.1rem;">Two sides of the table &mdash; the client, and the engineer directing AI</h1>
+        <p class="lede">The Product Owner isn't part of the delivery team &mdash; they're the client or customer. On the delivery side, nearly every other hat is worn by one <b>Forward Deployed AI Engineer (FDE)</b>, occasionally joined by SDETs when testing needs to scale.</p>
 
         <div class="panel" style="padding:0;overflow:hidden;margin-top:8px;">
           <table class="toolkit-table" style="margin:0;">
             <thead><tr><th style="width:16%;">Role / ceremony</th><th style="width:30%;">Human, accountable</th><th style="width:24%;">AI, does the work</th><th>&nbsp;</th></tr></thead>
             <tbody>
-              <tr><td><b>Product Owner</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Always this person</span></td><td>&mdash;</td><td>States the Intent, approves every gate, has the final word.</td></tr>
-              <tr><td><b>Business Analyst</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Elaboration)</span></td><td>Product Owner reviews and edits every round</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>proposal.md</code> &mdash; six open questions, the revision log.</td></tr>
-              <tr><td><b>Architect</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(design)</span></td><td>AI Engineer reviews and approves the shape</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>design.md</code> before Construction starts.</td></tr>
-              <tr><td><b>AI Engineer</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Construction)</span></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Directs, reviews, approves</span></td><td>Writes the code</td><td>The bot writes it; the engineer steers, reviews, and approves every Bolt before the next starts.</td></tr>
-              <tr><td><b>QA / Evaluator</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Extends the rubric, reviews results</span></td><td>Writes &amp; runs routine evals</td><td>A person adds the harder judgment-call evals and reviews every result; AI handles the routine ones, instantly.</td></tr>
-              <tr><td><b>Security / InfoSec</b></td><td>Signs off before Security Baseline passes</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Runs the attack</span></td><td>AI tries to trick or break it; a human decides if the fix is enough.</td></tr>
-              <tr><td><b>DevOps</b></td><td>Reviewed as part of each Bolt</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Wires it up</span></td><td>Monitoring, releases, and deployment configuration.</td></tr>
+              <tr><td><b>Product Owner</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account-tie"></iconify-icon>Client / customer side</span></td><td>&mdash;</td><td>States the Intent, approves every gate, has the final word.</td></tr>
+              <tr><td><b>Business Analyst</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Elaboration)</span></td><td>FDE drafts; Product Owner reviews each round</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>proposal.md</code> &mdash; six open questions, the revision log.</td></tr>
+              <tr><td><b>Architect</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(design)</span></td><td>FDE</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Drafts it</span></td><td>Drafts <code>design.md</code> before Construction starts.</td></tr>
+              <tr><td><b>Forward Deployed AI Engineer</b><br><span style="font-size:0.85em;color:var(--color-mid-gray);">(Mob Construction)</span></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Directs, reviews, approves every Bolt</span></td><td>Writes the code</td><td>The bot writes it; the FDE steers, reviews, and approves every Bolt before the next starts.</td></tr>
+              <tr><td><b>QA / Evaluator</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account-group"></iconify-icon>FDE, sometimes + SDETs</span></td><td>Writes &amp; runs routine evals</td><td>The FDE (or an SDET, at scale) adds the harder judgment-call evals and reviews every result; AI handles the routine ones, instantly.</td></tr>
+              <tr><td><b>Security / InfoSec</b></td><td>FDE signs off</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Runs the attack</span></td><td>AI tries to trick or break it; the FDE decides if the fix is enough.</td></tr>
+              <tr><td><b>DevOps</b></td><td>FDE, reviewed per Bolt</td><td><span class="role-badge ai"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Wires it up</span></td><td>Monitoring, releases, and deployment configuration.</td></tr>
               <tr><td><b>Visual Designer</b></td><td>&mdash;</td><td><span class="role-badge ai" style="opacity:0.55;"><iconify-icon icon="mdi:robot-outline"></iconify-icon>Not used yet</span></td><td>No on-screen interface exists yet &mdash; this role joins once one is built.</td></tr>
-              <tr><td><b>UAT</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account"></iconify-icon>Product Owner, in person</span></td><td>&mdash;</td><td>A real run, not a stand-in &mdash; e.g. an actual chat conversation.</td></tr>
+              <tr><td><b>UAT</b></td><td><span class="role-badge human"><iconify-icon icon="mdi:account-tie"></iconify-icon>Product Owner, in person</span></td><td>&mdash;</td><td>A real run, not a stand-in &mdash; e.g. an actual chat conversation.</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="emphasis-box green" style="margin-top:10px;">
-          <b>Three people carry this project:</b> the <b>Product Owner</b> (Intent, every gate, UAT), the <b>AI Engineer</b> (reviews and approves every Bolt's actual code), and <b>QA</b> (extends the rubric, reviews every eval run). Every other hat above is one of these three people directing an AI agent &mdash; never an AI agent left unsupervised.
+          <b>Two roles carry this project:</b> the <b>Product Owner</b> on the client side (Intent, every gate, UAT), and a single <b>Forward Deployed AI Engineer</b> on the delivery side, directing AI agents through nearly every other ceremony &mdash; occasionally reinforced by SDETs when eval coverage needs to scale.
+        </div>
+        <div class="emphasis-box amber" style="margin-top:8px;">
+          <b>The honest footnote:</b> for this specific project there was no separate client and delivery team &mdash; one person, <b>Senthil</b>, played every hat above, Product Owner included, as a solo experiment in running the full AI-DLC method end to end. This slide shows the general pattern because that's the useful thing to learn from it.
         </div>
       </section>
 
